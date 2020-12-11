@@ -16,3 +16,22 @@ End Select
 rn = rn + 1
 Loop
 End Sub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+'二、Do until + select case(对非空单位格所在行，进行分类、标识)
+Public Sub dowhileselectcase()
+Dim rn%
+rn = 2
+Do Until Cells(rn, 4) = ""
+Select Case Cells(rn, 4)
+Case Is > 100000000
+Cells(rn, 6) = "A"
+Case Is > 50000000
+Cells(rn, 6) = "B"
+Case Is > 10000000
+Cells(rn, 6) = "C"
+Case Else
+Cells(rn, 6) = "D"
+End Select
+rn = rn + 1
+Loop
+End Sub
