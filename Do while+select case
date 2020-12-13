@@ -70,5 +70,21 @@ End Sub
 22淡红可
 38淡红
 ~~~~~~~~~~~~~~~~
-四、
-
+四、表单内指定区域内单元格，根据其值，填充不同背景色
+Public Sub foreachnext()
+Dim a As Range, n!
+For Each a In Sheet2.Range("b2:b17")
+If a >= 60 Then a.Interior.ColorIndex = 4
+If a < 60 Then a.Interior.ColorIndex = 3
+Next
+End Sub
+········································
+五、提取工作簿内各工作表名字
+Public Sub foreachnext2()
+Dim a As Worksheet, i!
+i = 1
+For Each a In Worksheets
+i = i + 1
+Sheet2.Cells(i, 3) = a.Name
+Next
+End Sub
