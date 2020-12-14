@@ -88,3 +88,14 @@ i = i + 1
 Sheet2.Cells(i, 3) = a.Name
 Next
 End Sub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+六、九九乘法表
+Public Sub 九九乘法表()
+Dim a As Byte, b As Byte
+For a = 1 To 9
+For b = 1 To 9
+Cells(a, b) = a & "×" & b & "=" & a * b
+If b > a Then Cells(a, b) = ""
+Next
+Next
+End Sub
