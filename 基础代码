@@ -114,4 +114,14 @@ Next
 Next
 End Sub
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-八、
+八、exit是退出当前语句
+exit do,
+exit for
+exit function
+exit sub
+END结束一个过程或块
+end
+end function
+end if
+end select
+end sub
