@@ -89,7 +89,7 @@ Sheet2.Cells(i, 3) = a.Name
 Next
 End Sub
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-六、九九乘法表
+六、九九乘法表1
 Public Sub 九九乘法表()
 Dim a As Byte, b As Byte
 For a = 1 To 9
@@ -99,3 +99,19 @@ If b > a Then Cells(a, b) = ""
 Next
 Next
 End Sub
+~~~~~~~~~~~~~~
+七、九九乘法表2
+Public Sub 乘法表2()
+Dim a As Byte, b As Byte
+For a = 1 To 9
+For b = 1 To 9
+If b > a Then
+Exit For
+Else
+Cells(a, b) = a & "×" & b & "=" & a * b
+End If
+Next
+Next
+End Sub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+八、
