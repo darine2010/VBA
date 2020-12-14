@@ -125,3 +125,28 @@ end function
 end if
 end select
 end sub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+九、关于用户名及密码的凑数。
+Public Sub gotoline1()
+Dim a$, b$, i!, j!
+100:
+i = i + 1
+If i > 3 Then Exit Sub
+a = InputBox("请输入用户名：")
+If a <> "admin" Then
+MsgBox "用户名输入错误，请重新输入！"
+GoTo 100
+Else
+GoTo 101
+End If
+101:
+j = j + 1
+If j > 3 Then Exit Sub
+b = InputBox("请输入密码：")
+If b <> "123" Then
+MsgBox "密码输入错误，请重新输入！"
+GoTo 101
+Else
+MsgBox "欢迎登陆！"
+End If
+End Sub
