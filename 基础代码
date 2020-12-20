@@ -182,4 +182,11 @@ Cells(i + 1, "c") = a
 Next
 End Sub
 '''''''''''''''''''''''''''''''
-十三、
+十三、单元格的选择
+Sub rng3()
+Dim i%
+i = Application.CountA(Range("c:c"))
+Range("c" & i).Select
+Range("a1", "c" & i).Select
+Range("a1:c" & i).Select
+End Sub
