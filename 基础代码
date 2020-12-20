@@ -150,3 +150,36 @@ Else
 MsgBox "欢迎登陆！"
 End If
 End Sub
+'''''''''
+十、range函数的使用
+Sub rng()
+Range("a5").Select
+Range("a:a").Select
+Range("3:3").Select
+Range("a3:b6").Select
+Range("a2:b5.a7:d10").Select
+End Sub
+
+Sub rng()
+Debug.Print Range("a:a").Count
+Debug.Print Range("2:2").Count
+Debug.Print Application.CountA(Range("a:a"))
+Debug.Print Application.CountA(Range("2:2"))
+End Sub
+''''''''''''''''''''''
+十二、从库存编码中挑选已核对过的部分
+Sub checkdata1()
+Dim ra As Range, rb As Range, a$,b$,i%
+For Each ra In Range("a2:a7")
+    a = ra.Value
+        For Each rb In Range("b2:b4")
+        b = rb.Value
+        If a = b Then GoTo 100
+     Next
+i = i + 1
+Cells(i + 1, "c") = a
+100:
+Next
+End Sub
+'''''''''''''''''''''''''''''''
+十三、
