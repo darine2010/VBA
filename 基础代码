@@ -190,3 +190,23 @@ Range("c" & i).Select
 Range("a1", "c" & i).Select
 Range("a1:c" & i).Select
 End Sub
+'''''''''''''''''''''''''''
+十四、标示指定区域内符合条件的单元格，其数值累加求和、求平均
+Sub avg()
+Dim j%, i%, a@, sum@
+For j = 1 To 36
+Range("d2:e19")(j).Select
+a = Range("d2:e19")(j)
+If a >= 50000000 Then
+sum = sum + a
+i = i + 1
+Range("d2:e19")(j).Interior.ColorIndex = 20
+End If
+Next
+MsgBox "The average of the balance that bigger than 50000000 is:" & Int(sum / i)
+End Sub
+''''''''''''''''''
+十五、区域引用时代码使用
+range("a1:c" & i).select '引用单元格区域且有变量
+cells(i,"c").select '引用的是单元格且有变量
+[a1:c12].select '引用的是单元格且无变量
