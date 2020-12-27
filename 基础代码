@@ -207,7 +207,7 @@ MsgBox "The average of the balance that bigger than 50000000 is:" & Int(sum / i)
 End Sub
 ''''''''''''''''''
 十五、区域引用时代码使用
-range("a1:c" & i).select '引用单元格区域且有变量
+range("a1:c" & i).select '引用单元格区域且有变量。range后：列号对应的字母需用双引号引起来，变量不需要。
 cells(i,"c").select '引用的是单元格且有变量
 [a1：c12] .select'引用的是单元格且无变量
 '''''''''''''
