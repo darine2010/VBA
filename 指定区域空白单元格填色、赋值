@@ -1,0 +1,12 @@
+'指定区域内空白单元格填色、赋值
+Sub test1()
+Dim rng As Range, rn$
+On Error Resume Next
+For Each rng In Sheet2.[b1:h19]
+If rng = "" Then
+rn = rn & rng.Address(1, 1) & ","
+rng.Interior.ColorIndex = 20
+End If
+Next
+Range(Left(rn, Len(rn) - 1)) = "lost"
+End Sub
