@@ -1,0 +1,5 @@
+方式一
+清空单元格内容:
+sheets(“sheet1”).Range(“1:65536”).ClearContents
+删除单元格的内容、格式
+sheets(“sheet1”).Range(“1:65536”).Clear
