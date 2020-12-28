@@ -1,0 +1,7 @@
+求工作表内数据单元格列数、转换为字母
+Sub cutcopy()
+r = Application.CountA(Sheet5.Columns("a:a"))
+c = Chr(Application.CountA(Sheet5.Rows(1)) + 96)
+'Sheets("test1").cells.Clear
+Sheet5.Range("a1:" & c & r).Copy Sheets("test1").[b2]
+End Sub
