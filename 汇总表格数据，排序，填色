@@ -1,0 +1,49 @@
+Sub result1()
+  Sheets("result").Unprotect ("123") '???:????
+  Sheets("result").Activate
+  [a4:i18].Clear
+a = Sheets.Count '???????????
+On Error Resume Next
+For i = 1 To a - 1
+b = i + 3 '??????4???
+Sheets("result").Cells(b, "a") = i '??
+Sheets("result").Cells(b, "b") = Sheets(i).Name
+Sheets("result").Cells(b, "c") = Application.WorksheetFunction.Sum(Sheets(i).Range("g3:g5"))
+Sheets("result").Cells(b, "d") = Application.WorksheetFunction.Sum(Sheets(i).Range("g6:g11"))
+Sheets("result").Cells(b, "e") = Application.WorksheetFunction.Sum(Sheets(i).Range("g12:g16"))
+Sheets("result").Cells(b, "f") = Application.WorksheetFunction.Sum(Sheets(i).Range("g17:g20"))
+Sheets("result").Cells(b, "g") = Application.WorksheetFunction.Sum(Sheets(i).Range("g21:g25"))
+Sheets("result").Cells(b, "h") = Application.WorksheetFunction.Sum(Sheets(i).Range("g26:g27"))
+Sheets("result").Cells(b, "i") = Application.WorksheetFunction.Sum(Range("c" & b & ":" & "h" & b))
+
+Next
+
+'排序
+    ActiveWorkbook.Worksheets("result").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("result").Sort.SortFields.Add2 Key:=Range("I4:I18") _
+        , SortOn:=xlSortOnValues, Order:=xlDescending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("result").Sort
+        .SetRange Range("B3:I18")
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+     
+ 
+   '设定单元格格式
+    Range("B3:I18").Select
+      Selection.NumberFormat = "0.00"
+
+'设定行高、列宽
+Range("4:18").RowHeight = 25
+ Range("c:i").ColumnWidth = 15
+For i = 4 To Sheets.Count + 2
+If i Mod 2 <> 0 Then Range("a" & i & ":i" & i).Interior.ColorIndex = 36
+  Next
+'保护工作表
+    Sheets("result").Protect 123
+    MsgBox "本期考核结果已汇总、排序，谢谢！"
+End Sub
+
