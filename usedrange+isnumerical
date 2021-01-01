@@ -1,0 +1,13 @@
+Sub usedrange2()
+Dim rng As Range
+cells.ClearFormats
+For Each rng In Sheets("test1").[d:d]
+If IsNumeric(rng) And rng > 5000 Then
+k = k + 1
+rng.Interior.ColorIndex = 6
+cells(rng.Row, "b").Interior.ColorIndex = 6
+End If
+Next
+MsgBox "账户余额大于5000万的有" & k & "家银行。"
+
+End Sub
