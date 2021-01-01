@@ -227,3 +227,17 @@ Sub rowcolumn()
 [3:3].Select
 [1:5].Select
 End Sub
+十七、usedrange+isnumerical对已使用区域进行数据筛选及范围判断，并设定格式、返回结果。
+Sub usedrange2()
+Dim rng As Range
+cells.ClearFormats
+For Each rng In Sheets("test1").[d:d]
+If IsNumeric(rng) And rng > 5000 Then
+k = k + 1
+rng.Interior.ColorIndex = 6
+cells(rng.Row, "b").Interior.ColorIndex = 6
+End If
+Next
+MsgBox "账户余额大于5000万的有" & k & "家银行。"
+
+End Sub
