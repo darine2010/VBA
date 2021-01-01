@@ -1,0 +1,19 @@
+6.range对象于With结合
+
+  range对象和with结合起来使用，可以使程序变得非常简单，看一下下面的实例吧：
+
+程序：
+
+Sub range用法()
+
+With Range("a1").Font
+
+  .Size = 16
+
+  .ColorIndex = 24
+
+  .FontStyle = "bold"
+
+End With
+
+End Sub
