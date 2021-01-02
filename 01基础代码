@@ -241,3 +241,4 @@ Next
 MsgBox "账户余额大于5000万的有" & k & "家银行。"
 
 End Sub
+十八、formulaarray,currnetrange
