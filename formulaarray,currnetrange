@@ -1,0 +1,14 @@
+使用根据（起始单元格，及行、列偏移量），设置一个区域。(range、cells.range().row,range().column )
+集成数组的加和&
+
+Private Sub currentrangeapp()
+
+a = [d25].CurrentRegion.Address
+b = [d27].CurrentRegion.Address
+c = [d25].CurrentRegion.Count - 1
+e = Range("d30").Column
+'range("起始单元格",cells(range("起始单元格").row+数值,range("起始单元格").column+数值))
+Set d = Range("d30", cells(Range("d30").Row, Range("d30").Column + c)) 
+d.FormulaArray = "=" & a & "+" & b
+
+End Sub
