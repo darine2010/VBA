@@ -1,0 +1,29 @@
+二十一、变量或数组引用不连续单元格（array,for each）
+Sub datatodb1()
+Dim rng As Range, rng1 As Range
+Set rng1 = Range("a5,d10,c15,d20,c25")
+Set a = [a5]
+Set b = [d10]
+Set c = [c15]
+Set d = [d20]
+Set e = [c25]
+brr = Array(a, b, c, d, e)
+i = 0
+col = 1
+j = Application.CountA(Sheets("DB1").Columns(1)) + 1
+For Each rng In rng1
+rng = brr(i)
+Sheets("Formula").Activate
+brr(i).CurrentRegion.Select
+rn = Selection.Rows.Count - 1
+cn = Selection.Columns.Count
+Sheets("DB1").Cells(j, col).Resize(rn, cn) = brr(i).Offset(1).Resize(rn, cn).Value
+Sheets("DB1").Cells(j, col).Resize(rn, cn).NumberFormatLocal = "#,##0.00"
+col = col + cn
+i = i + 1
+Next
+MsgBox "请注意，本期数据入库成功！"
+End Sub
+参照：
+https://blog.csdn.net/logo_28/article/details/104860715
+https://blog.csdn.net/navy2009/article/details/7309141?utm_medium=distribute.pc_relevant.none-task-blog-OPENSEARCH-12.not_use_machine_learn_pai&depth_1-utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-12.not_use_machine_learn_pai
