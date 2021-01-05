@@ -1,0 +1,32 @@
+十九：工作薄及工作表加密、解密
+Sub protect()
+
+   Application.ScreenUpdating = False
+
+   uPW = Application.InputBox(prompt:="键入密码", Title:="Input", Type:=2)
+
+   For i = 1 To Sheets.Count
+
+      Sheets(i).protect Password:=uPW
+
+   Next i
+
+   Application.ScreenUpdating = True
+
+End Sub
+
+Sub unProtect()
+
+   Application.ScreenUpdating = False
+
+   uPW = Application.InputBox(prompt:="键入密码", Title:="Input", Type:=2)
+
+   For i = 1 To Sheets.Count
+
+      Sheets(i).unProtect Password:=uPW
+
+   Next i
+
+   Application.ScreenUpdating = True
+
+End Sub
