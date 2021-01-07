@@ -1,0 +1,10 @@
+Sub entire2()
+Dim rng As Range, ads As String
+Sheet6.Activate
+For Each rng In [b1:b18]
+If rng = "" Then ad = ad & rng.Address & ","
+Next
+ads = Left(ad, Len(ad) - 1)
+Range(ads).EntireRow.Delete
+
+End Sub
