@@ -320,3 +320,14 @@ i = i + 1
 Next
 MsgBox "请注意，本期数据入库成功！"
 End Sub
+二十二、删空行（删除选定区域空值单元格所在行）（entirerow left函数）
+Sub entire2()
+Dim rng As Range, ads As String
+Sheet6.Activate
+For Each rng In [b1:b18]
+If rng = "" Then ad = ad & rng.Address & ","
+Next
+ads = Left(ad, Len(ad) - 1)
+Range(ads).EntireRow.Delete
+
+End Sub
