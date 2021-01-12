@@ -331,3 +331,16 @@ ads = Left(ad, Len(ad) - 1)
 Range(ads).EntireRow.Delete
 
 End Sub
+二十三 将单元格值缩小10000
+Sub shrink10000()
+
+Sheet25.Cells(1, "d").Copy 'chose the cell values 10000
+
+Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+        Selection.NumberFormatLocal = "#,##0.00"
+       With ActiveWindow.RangeSelection
+      .Columns.AutoFit
+      .Rows.AutoFit
+    End With
+End Sub
