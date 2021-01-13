@@ -346,6 +346,7 @@ Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
 End Sub
 
 二十四、建辅助工作表DBsub,用于缩小比例1/10000
+方案一：
 Sub shrink10000()
 Dim sht As Worksheet
 On Error Resume Next
@@ -359,7 +360,7 @@ If Worksheets("DBsub") Is Nothing Then
         
     End If
     Worksheets("DBsub").Cells(1, "a").Copy
-If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Activate
+If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Activate '自动切换回当前活动单元表之上一个工作表
 
 Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
         :=False, Transpose:=False
@@ -378,5 +379,33 @@ Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
     Worksheets("DBsub").Delete
     Application.DisplayAlerts = True
         
+End Sub
+方案二：
+Sub shrink10000()
+Dim sht As Worksheet
+On Error Resume Next
+If Worksheets("DBsub") Is Nothing Then
+    With Worksheets
+        Set sht = .Add(after:=ActiveSheet)
+        sht.Name = "DBsub"
+        sht.Range("a1:a2") = Array("10000", "0")
+    End With
+End If
+    Worksheets("DBsub").[a1] = 10000
+   Worksheets("DBsub").[a1].Copy
+If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Select
+Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+        Selection.NumberFormatLocal = "#,##0.00"
+    With Selection.Font
+        .Name = "times new roman"
+        .Size = 14
+        .Bold = False
+        .Italic = False
+        .Color = RGB(255, 0, 0)
+        End With
+'    Application.DisplayAlerts = False
+'    Worksheets("DBsub").Delete
+'    Application.DisplayAlerts = True
 End Sub
 
