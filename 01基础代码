@@ -344,3 +344,39 @@ Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
       .Rows.AutoFit
     End With
 End Sub
+
+二十四、建辅助工作表DBsub,用于缩小比例1/10000
+Sub shrink10000()
+Dim sht As Worksheet
+On Error Resume Next
+'a = thisworksheet
+If Worksheets("DBsub") Is Nothing Then
+     With Worksheets
+        Set sht = .Add(after:=ActiveSheet)
+        sht.Name = "DBsub"
+        sht.Range("a1:a2") = Array("10000", "0")
+        End With
+        
+    End If
+    Worksheets("DBsub").Cells(1, "a").Copy
+If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Activate
+
+Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+    Selection.NumberFormatLocal = "#,##0.00"
+    With Selection.Font
+        .Name = "times new roman"
+        .Size = 14
+        .Color = RGB(255, 0, 0)
+        .Bold = False
+        .Italic = False
+       End With
+'        .Columns.AutoFit
+'        .Rows.AutoFit
+      
+    Application.DisplayAlerts = False
+    Worksheets("DBsub").Delete
+    Application.DisplayAlerts = True
+        
+End Sub
+
