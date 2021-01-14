@@ -331,81 +331,37 @@ ads = Left(ad, Len(ad) - 1)
 Range(ads).EntireRow.Delete
 
 End Sub
-二十三 将单元格值缩小10000
-Sub shrink10000()
-
-Sheet25.Cells(1, "d").Copy 'chose the cell values 10000
-
+二十三 将单元格值格式设为数字、缩小10000（selection offset）
+Sub mod10000()
+a = Selection.CurrentRegion.Rows.Count
+Selection.NumberFormatLocal = "#,##0.00"
+With Selection(1).Offset(a)
+.Value = 10000
+.NumberFormatLocal = "#,##0.00"
+.Copy
+End With
+Selection.Select
 Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
-        :=False, Transpose:=False
-        Selection.NumberFormatLocal = "#,##0.00"
-       With ActiveWindow.RangeSelection
-      .Columns.AutoFit
-      .Rows.AutoFit
-    End With
+       :=False, Transpose:=False
+ Selection(1).Offset(a) = ""
 End Sub
 
-二十四、建辅助工作表DBsub,用于缩小比例1/10000
-方案一：
-Sub shrink10000()
-Dim sht As Worksheet
-On Error Resume Next
-'a = thisworksheet
-If Worksheets("DBsub") Is Nothing Then
-     With Worksheets
-        Set sht = .Add(after:=ActiveSheet)
-        sht.Name = "DBsub"
-        sht.Range("a1:a2") = Array("10000", "0")
-        End With
-        
-    End If
-    Worksheets("DBsub").Cells(1, "a").Copy
-If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Activate '自动切换回当前活动单元表之上一个工作表
+Sub date2num()
+a = Selection.CurrentRegion.Rows.Count
+Selection.NumberFormatLocal = "#,##0.00"
+With Selection(1).Offset(a)
+.Value = 0
+.NumberFormatLocal = "#,##0.00"
+.Copy
+End With
+Selection.Select
+Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlAdd, SkipBlanks _
+       :=False, Transpose:=False
+ Selection(1).Offset(a) = ""
+End Sub
 
-Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
-        :=False, Transpose:=False
-    Selection.NumberFormatLocal = "#,##0.00"
-    With Selection.Font
-        .Name = "times new roman"
-        .Size = 14
-        .Color = RGB(255, 0, 0)
-        .Bold = False
-        .Italic = False
-       End With
-'        .Columns.AutoFit
-'        .Rows.AutoFit
-      
-    Application.DisplayAlerts = False
-    Worksheets("DBsub").Delete
-    Application.DisplayAlerts = True
-        
-End Sub
-方案二：
-Sub shrink10000()
-Dim sht As Worksheet
-On Error Resume Next
-If Worksheets("DBsub") Is Nothing Then
-    With Worksheets
-        Set sht = .Add(after:=ActiveSheet)
-        sht.Name = "DBsub"
-        sht.Range("a1:a2") = Array("10000", "0")
-    End With
-End If
-    Worksheets("DBsub").[a1] = 10000
-   Worksheets("DBsub").[a1].Copy
-If ActiveSheet.Index <> 1 Then Sheets(ActiveSheet.Index - 1).Select
-Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
-        :=False, Transpose:=False
-        Selection.NumberFormatLocal = "#,##0.00"
-    With Selection.Font
-        .Name = "times new roman"
-        .Size = 14
-        .Bold = False
-        .Italic = False
-        .Color = RGB(255, 0, 0)
-        End With
-'    Application.DisplayAlerts = False
-'    Worksheets("DBsub").Delete
-'    Application.DisplayAlerts = True
-End Sub
+
+
+
+
 
