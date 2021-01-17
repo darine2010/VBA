@@ -359,7 +359,35 @@ Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlAdd, SkipBlanks _
        :=False, Transpose:=False
  Selection(1).Offset(a) = ""
 End Sub
-
+二十四、data2db1
+Sub datatodb1()
+Dim rng As Range, rng1 As Range
+Set rng1 = Range("a5,d10,c15,d20,c25")
+Set a = [a5]
+Set b = [d10]
+Set c = [c15]
+Set d = [d20]
+Set e = [c25]
+brr = Array(a, b, c, d, e)
+i = 0
+col = 1
+j = Application.CountA(Sheets("DB1").Columns(1)) + 1
+m = Month(Date) - 1
+For Each rng In rng1
+rng = brr(i)
+Sheets("Formula").Activate
+brr(i).CurrentRegion.Select
+rn = Selection.Rows.Count - 1
+cn = Selection.Columns.Count
+Sheets("DB1").Cells(j, col).Resize(rn, cn) = brr(i).Offset(1).Resize(rn, cn).Value
+Sheets("DB1").Cells(j, col).Resize(rn, cn).NumberFormatLocal = "#,##0.00"
+col = col + cn
+If m Mod 3 = 0 Then GoTo 100
+i = i + 1
+Next
+100:
+MsgBox "Çë×¢Òâ£¬±¾ÆÚÊý¾ÝÈë¿â³É¹¦£¡"
+End Sub
 
 
 
