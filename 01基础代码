@@ -388,8 +388,22 @@ Next
 100:
 MsgBox "Çë×¢Òâ£¬±¾ÆÚÊý¾ÝÈë¿â³É¹¦£¡"
 End Sub
-
-
+二十五、
+thisworkbook 代码所在的工作薄
+activeworkbook 当前被激活的工作薄
+thisworkbook.path 代码所在文件的路径
+thisworkbook.fullname 代码所在文件的路径及文件名
+二十六、工作薄的创建、另存为、打开、关闭、复制、删除
+Sub test0118()
+Dim wkb As Workbook
+Set wkb = Workbooks.Add
+Set wkb = Workbooks.Open("d:\321.xls") 'open,save as，kill时，需要加路径
+wkb.SaveAs "d:\123.xls"
+Workbooks("123.xls").Close '关闭工作薄时，括号内只显示工作薄名，不可以有路径
+TrueFileCopy "d:\123.xls", "d:\321.xls"
+Workbooks("321.xls").Close 
+Kill "d:\321.xls"
+End Sub
 
 
 
