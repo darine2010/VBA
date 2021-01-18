@@ -399,11 +399,11 @@ Dim wkb As Workbook
 Set wkb = Workbooks.Add
 Set wkb = Workbooks.Open("d:\321.xls") 'open,save as，kill时，需要加路径
 wkb.SaveAs "d:\123.xls"
-Workbooks("123.xls").Close '关闭工作薄时，括号内只显示工作薄名，不可以有路径
-TrueFileCopy "d:\123.xls", "d:\321.xls"
+Workbooks("123.xls").Close True'关闭工作薄时，括号内只显示工作薄名，不可以有路径
+FileCopy "d:\123.xls", "d:\321.xls" '两个地址之前的逗号隔开
 Workbooks("321.xls").Close 
 Kill "d:\321.xls"
 End Sub
-
+二十七、
 
 
