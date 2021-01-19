@@ -404,6 +404,23 @@ FileCopy "d:\123.xls", "d:\321.xls" '两个地址之前的逗号隔开
 Workbooks("321.xls").Close 
 Kill "d:\321.xls"
 End Sub
-二十七、
+二十七、循环建表、删表
+Sub test1()
+Dim i%
+For i = 12 To 1 Step -1
+Worksheets.Add.Name = i & "mon"
+Next
+End Sub
+
+Sub test2()
+Dim i%
+Application.DisplayAlerts = False
+For i = 1 To 12
+Sheets(i & "mon").Delete
+Next
+Application.DisplayAlerts = True
+
+End Sub
+
 
 
