@@ -421,6 +421,24 @@ Next
 Application.DisplayAlerts = True
 
 End Sub
+二十八、新增、删除工作表
+新增加工作表
+Sub test0120()
+Dim wst As Worksheet
+For i = 1 To 12
+Set wst = Worksheets.Add
+wst.Name = i & "mon"
+wst.Move , Sheets(Sheets.Count)
+Next
+End Sub
+''''''''删除工作表
+Sub delwst()
+Application.DisplayAlerts = False
+For i = 1 To 12
+Sheets(i & "mon").Delete
+Next
+Application.DisplayAlerts = True
+End Sub
 
 
 
