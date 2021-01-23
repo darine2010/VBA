@@ -439,6 +439,21 @@ Sheets(i & "mon").Delete
 Next
 Application.DisplayAlerts = True
 End Sub
+二十九、
+Sub 工作薄内各表拆分为独立工作薄()
+Application.DisplayAlerts = False
+b = ThisWorkbook.Path
+c = Workbooks.Count
+For i = 1 To Sheets.Count
+a = Sheets(i).Name
+Set wkb = Workbooks.Add
+Workbooks(1).Sheets(i).Copy before:=Workbooks(c + 1).Sheets(1)
+wkb.SaveAs b & "\" & a & ".xlsx"
+    wkb.Close
+    Next
+    Application.DisplayAlerts = True
+End Sub
+
 
 
 
