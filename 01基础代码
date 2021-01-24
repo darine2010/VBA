@@ -440,15 +440,29 @@ Next
 Application.DisplayAlerts = True
 End Sub
 二十九、
-Sub 工作薄内各表拆分为独立工作薄()
+Sub 拆分活动工作薄各表并新建工作薄单独保存()
+Dim sht As Worksheet, wkb As Workbook
 Application.DisplayAlerts = False
-b = ThisWorkbook.Path
+'新建工作表，查看所有已打开工作薄的名字及序号
+Set sht = Worksheets.Add
+For Each wkb In Workbooks
+i = i + 1
+sht.Cells(i, 1) = Workbooks(i).Name
+Next
+'查找当前活动工作薄在所有已打开工作薄中所属的序号
+a = sht.Columns(1).Find(ActiveWorkbook.Name).Row
+sht.Delete
+
+b = ActiveWorkbook.Path
+'找到新到工作薄所属的序号c+1
 c = Workbooks.Count
 For i = 1 To Sheets.Count
-a = Sheets(i).Name
+d = Sheets(i).Name
+
 Set wkb = Workbooks.Add
-Workbooks(1).Sheets(i).Copy before:=Workbooks(c + 1).Sheets(1)
-wkb.SaveAs b & "\" & a & ".xlsx"
+'a为待拆分工作薄的序号，c+1为每个新建工作薄所属的序号
+Workbooks(a).Sheets(i).Copy before:=Workbooks(c + 1).Sheets(1)
+wkb.SaveAs b & "\" & d & ".xlsx"
     wkb.Close
     Next
     Application.DisplayAlerts = True
