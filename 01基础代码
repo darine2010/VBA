@@ -486,5 +486,81 @@ End Sub
     Next
 Next
  End Sub
+三十一、打印缴存表
+Sub prtjcb()
+ Dim rng As Range
 
+y = Application.InputBox("请输入待打印数据所属年份", "数据年份")
+ 
+ For Each rng In Sheets("DB2").Range("F6:F8")
+    j = 1
+    dep = rng(j).Value
+    For i = 1 To 12
+    If i < 10 Then
+    mon1 = 0 & i
+    Else: mon1 = i
+    End If
+     day1 = DateSerial(y, i + 1, 0)
+     date1 = Year(day1) & mon1 & Day(day1)
+     dataid1 = date1 & dep
+     
+    day2 = DateSerial(y, i, 0)
+    mon2 = Month(day2)
+    If mon2 < 10 Then mon2 = 0 & mon2
+    date2 = Year(day2) & mon2 & Day(day2)
+    dataid2 = date2 & dep
+    [b2] = rng(j).Offset(0, 1).Value
+    [d2] = date1
+'    [d2].NumberFormatLocal = "yyyy年mm月"
+    '查找本期数据
+    Set rng1 = Worksheets("DB1").[a1].CurrentRegion.Columns("a").Find(dataid1)
+    rn1 = rng1.Row
+    Sheets("DB1").Range("d" & rn1 & ":e" & rn1).Copy
+    Sheets("Prt-Jcb").[d6].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+    
+    Sheets("DB1").Range("f" & rn1 & ":s" & rn1).Copy
+    Sheets("Prt-Jcb").[d13].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+    
+     Sheets("DB1").Range("t" & rn1 & ":ai" & rn1).Copy
+    Sheets("Prt-Jcb").[d31].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+     '查找上期数据
+    Set rng2 = Worksheets("DB1").[a1].CurrentRegion.Columns("a").Find(dataid2)
+    rn2 = rng2.Row
+    Sheets("DB1").Range("l" & rn2 & ":n" & rn2).Copy
+    Sheets("Prt-Jcb").[d8].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+    
+     Sheets("DB1").Range("p" & rn2 & ":q" & rn2).Copy
+    Sheets("Prt-Jcb").[d11].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+    
+      Sheets("DB1").Range("v" & rn2 & ":w" & rn2).Copy
+    Sheets("Prt-Jcb").[d28].Select
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+        False, Transpose:=True
+    Application.CutCopyMode = False
+    Sheets("Prt-Jcb").[d30].Select
+    Selection = Sheets("DB1").Range("ab" & rn2)
+    Selection.NumberFormatLocal = "0"
+    '美化数据表
+    '打印数据表
+    ActiveWindow.SelectedSheets.PrintOut Copies:=1, Collate:=True, _
+        IgnorePrintAreas:=False
+    Next
+    j = j + 1
+Next
+ End Sub
 
