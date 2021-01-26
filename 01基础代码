@@ -468,6 +468,23 @@ wkb.SaveAs b & "\" & d & ".xlsx"
     Application.DisplayAlerts = True
 End Sub
 
-
+三十、打印年度数据报表（日期、机构的循环）
+ Sub paperprint()
+ Dim rng As Range
+  y = Application.InputBox("请输入待打印数据所属年份", "数据年份")
+ str1 = Array("QX", "HZ", "LT")
+ For j = 0 To 2
+ dep = str1(j)
+    For i = 1 To 12
+    If i < 10 Then
+    mon1 = 0 & i
+    Else: mon1 = i
+    End If
+     day1 = Day(DateSerial(y, i + 1, 0))
+    dataid = y & mon1 & day1 & dep
+    
+    Next
+Next
+ End Sub
 
 
