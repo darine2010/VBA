@@ -297,29 +297,38 @@ end sub
 二十一、变量或数组引用不连续单元格（array,for each）
 Sub datatodb1()
 Dim rng As Range, rng1 As Range
+核对是否已入库
+If Not Sheets("DB1").Columns(1).Find(Sheet4.[a6]) Is Nothing Then
+MsgBox "Be aware,Data had been copied yet!"
+End If
+Exit Sub
+brr = Array([a5], [d10], [c15], [d20], [c25])
 Set rng1 = Range("a5,d10,c15,d20,c25")
-Set a = [a5]
-Set b = [d10]
-Set c = [c15]
-Set d = [d20]
-Set e = [c25]
-brr = Array(a, b, c, d, e)
-i = 0
-col = 1
+
+
 j = Application.CountA(Sheets("DB1").Columns(1)) + 1
+col = 1
 For Each rng In rng1
+Workbooks("01jcb(QX)0125").Sheets("Formula").Activate
 rng = brr(i)
-Sheets("Formula").Activate
-brr(i).CurrentRegion.Select
-rn = Selection.Rows.Count - 1
-cn = Selection.Columns.Count
-Sheets("DB1").Cells(j, col).Resize(rn, cn) = brr(i).Offset(1).Resize(rn, cn).Value
-Sheets("DB1").Cells(j, col).Resize(rn, cn).NumberFormatLocal = "#,##0.00"
+
+rn = 3
+cn = Application.CountA(Rows(rng.Row))
+
+Workbooks("01jcb(QX)0125").Sheets("DB1").Activate
+Cells(j, col).Resize(rn, cn) = rng.Offset(1).Resize(rn, cn).Value
+
 col = col + cn
 i = i + 1
 Next
+Cells(j, 1).Resize(rn, col).NumberFormatLocal = "#,##0.00"
+'Cells(j, "b").Resize(3, 0).NumberFormatLocal = "m/d/yyyy"
+
+Cells(j, "am").Resize(3, 9).NumberFormatLocal = "0.00%"
+Cells(j, "ax").Resize(3, 3).NumberFormatLocal = "0.00%"
 MsgBox "请注意，本期数据入库成功！"
 End Sub
+
 二十二、删空行（删除选定区域空值单元格所在行）（entirerow left函数）
 Sub entire2()
 Dim rng As Range, ads As String
