@@ -397,6 +397,40 @@ Next
 100:
 MsgBox "Çë×¢Òâ£¬±¾ÆÚÊý¾ÝÈë¿â³É¹¦£¡"
 End Sub
+''''''''''''''''''''''''''''''''''''
+Sub datatodb12()
+Dim rng As Range
+''核对是否已入库
+If Not Sheets("DB1").Columns(1).Find(Sheet4.[a6]) Is Nothing Then
+MsgBox "Be aware,Data had been copied yet!"
+End If
+Exit Sub
+brr = Array([a5], [d10], [c15], [d20], [c25])
+j = Application.CountA(Sheets("DB1").Columns(1)) + 1
+col = 1
+rn = 3
+
+For Each rng In Range("a5,d10,c15,d20,c25")
+'工作表的切换，应放在循环语句内
+Sheets("Formula").Activate
+cn = Application.CountA(Rows(rng.Row))
+
+Sheets("DB1").Activate
+Cells(j, col).Resize(rn, cn) = rng.Offset(1).Resize(rn, cn).Value
+If Month(rng.Offset(, 1)) Mod 3 <> 0 Then GoTo 100
+col = col + cn
+
+Next
+100:
+Cells(j, 1).Resize(rn, col).NumberFormatLocal = "#,##0.00"
+'Cells(j, "b").Resize(3, 0).NumberFormatLocal = "m/d/yyyy"
+
+Cells(j, "am").Resize(3, 9).NumberFormatLocal = "0.00%"
+Cells(j, "ax").Resize(3, 3).NumberFormatLocal = "0.00%"
+MsgBox "请注意，本期数据入库成功！"
+End Sub
+
+
 二十五、
 thisworkbook 代码所在的工作薄
 activeworkbook 当前被激活的工作薄
