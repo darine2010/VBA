@@ -606,4 +606,15 @@ y = Application.InputBox("请输入待打印数据所属年份", "数据年份")
     j = j + 1
 Next
  End Sub
+ 三十二、unoin的对象：单元格或单元格区域，结果：单元格区域。
+Sub union1()
+Dim rng As Range
+For Each rng In Range([b2], [b8])
+rng.Select
+i = i + 1
+If i = 1 Then Set b = rng
+Set b = Union(b, rng)
+Next
+b.Select
+End Sub
 
