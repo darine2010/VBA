@@ -645,10 +645,18 @@ End Sub
 Sub intersect隔行插行()
 a = Application.CountA(Columns(1)) * 2
 For i = 0 To a Step 2
-Set b = Intersect([a1:b2].Offset(i), [a2:b3].Offset(i))
+Set b = Intersect([a1:a2].Offset(i), [a2:a3].Offset(i))
 
 b.Select
 b.EntireRow.Insert
 Next
 End Sub
-
+三十五、intersect隔列插列
+Sub intersect隔列插列()
+a = Application.CountA(Rows(2)) * 2
+For i = 0 To a Step 2
+Set b = Intersect([a1:b1].Offset(, i), [b1:c1].Offset(, i))
+b.Select
+b.EntireColumn.Insert
+Next
+End Sub
