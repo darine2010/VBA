@@ -641,4 +641,14 @@ Cells(j + 3, "j") = Cells(rng.Row, "a")
 Cells(j + 3, "k") = rng
 Next
 End Sub
+三十四、intersect隔行插行
+Sub intersect隔行插行()
+a = Application.CountA(Columns(1)) * 2
+For i = 0 To a Step 2
+Set b = Intersect([a1:b2].Offset(i), [a2:b3].Offset(i))
+
+b.Select
+b.EntireRow.Insert
+Next
+End Sub
 
