@@ -617,9 +617,8 @@ Set b = Union(b, rng)
 Next
 b.Select
 End Sub
-三十三、union应用（单条件筛选）
-Sub union成绩单筛选()
-Dim i%, rng As Range
+三十三、union应用（单条件筛选,符合条件的成绩查询）
+Dim i%, j%,rng As Range,rn%,cn%
 rn = Cells(Rows.Count, 1).End(xlUp).Row
 'rn = Columns(1).Find("*", , xlFormulas, , , , xlPrevious).Row
 If rn < 4 Then
@@ -636,3 +635,10 @@ If i = 1 Then Set res = rng
 Set res = Union(res, rng)
 End If
 Next
+For Each rng In res
+j = j + 1
+Cells(j + 3, "j") = Cells(rng.Row, "a")
+Cells(j + 3, "k") = rng
+Next
+End Sub
+
