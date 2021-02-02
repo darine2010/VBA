@@ -617,4 +617,22 @@ Set b = Union(b, rng)
 Next
 b.Select
 End Sub
-
+三十三、union应用（单条件筛选）
+Sub union成绩单筛选()
+Dim i%, rng As Range
+rn = Cells(Rows.Count, 1).End(xlUp).Row
+'rn = Columns(1).Find("*", , xlFormulas, , , , xlPrevious).Row
+If rn < 4 Then
+MsgBox "No data in the sheet!"
+Exit Sub
+Else
+Range([j4], Cells(rn, "k")).Clear
+End If
+cn = Rows("3").Find([k3]).Column
+For Each rng In Range(Cells(4, cn), Cells(rn, cn))
+If rng > 90 Then
+i = i + 1
+If i = 1 Then Set res = rng
+Set res = Union(res, rng)
+End If
+Next
