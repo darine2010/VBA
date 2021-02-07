@@ -660,3 +660,16 @@ b.Select
 b.EntireColumn.Insert
 Next
 End Sub
+三十六、背景色填充的三种方法
+Sub test01207()
+For i = 1 To 256
+Cells(i, 2) = i
+Cells(i, 1).Interior.ColorIndex = i
+next
+    For i = 1 To 12
+    Cells(i, 3).Interior.Color = QBColor(i)
+    Cells(i, 4) = i
+    next
+Cells(1, "j").Interior.Color = RGB([g1], [h1], [i1])
+cells(1,1).interior.color=[a1] '0~255^3
+End Sub
