@@ -673,3 +673,27 @@ next
 Cells(1, "j").Interior.Color = RGB([g1], [h1], [i1])
 cells(1,1).interior.color=[a1] '0~255^3
 End Sub
+三十七 格式化成绩单或工资条(隔行插入)
+Sub test02071()
+rn = Cells(Rows.Count, 1).End(xlUp).Row
+If rn < 3 Then Exit Sub
+For i = 5 To (rn - 4) * 2 + 5 - 1 Step 2
+'If Cells(i, 1) = "No." Then Cells(i, 1).EntireRow.Delete
+If i + 2 Mod 2 <> 0 Then Cells(i, 1).EntireRow.Insert
+[a3:f3].Copy [a3:f3].Offset(i - 3)
+Next
+
+For j = 3 To Cells(Rows.Count, 1).End(xlUp).Row
+If j Mod 2 <> 0 Then
+    With Cells(j, 1).EntireRow.Range("a1:f1").Font
+    .Name = "黑体"
+    .Bold = True
+    .Size = 18
+    End With
+Else: With Cells(j, 1).EntireRow.Range("a1:f1").Font
+.Name = "times new roman"
+.Size = 16
+End With
+End If
+Next
+End Sub
