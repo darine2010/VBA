@@ -1,0 +1,574 @@
+第4章 Excel与数据库连接
+
+4-87向未打开的Excel文件中输入数据
+Sub 输入()
+Set Conn = CreateObject(“adodb.connection”)
+Set rst = CreateObject(“ADODB.recordset”)
+Conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.Path & “/数据库.xls” ‘打开数据库文件接口
+rst.Open “select * from [Sheet1$]”, Conn, , adLockOptimistic ‘输入无须用adOpenKeyset 键集游标
+rst.addnew
+rst.fields(“姓名”) = [D3].Value
+rst.fields(“年龄”) = [D5].Value
+rst.fields(“性别”) = [D7].Value
+rst.Update
+rst.Close
+Conn.Close
+Set rst = Nothing
+Set Conn = Nothing
+MsgBox “已输入到数据库”
+End Sub
+
+4-88合并多个未打开的Excel文件中的数据
+Sub 合并数据()
+Dim Y As Long
+Y = [a65536].End(xlUp).Row + 1
+Range(“A2:G” & Y).ClearContents
+Set Conn = CreateObject(“adodb.connection”) ‘（1）设置对象
+For X = 1 To 4
+Conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.Path & “/” & X & “月.xls” ‘打开数据库文件接口
+Sql = “select * from [” & X & “月$]” ‘从1~4月工作表提取数据
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset Conn.Execute(Sql)
+Conn.Close ‘关闭链接
+Next X
+Set Conn = Nothing ‘释放对象变量
+End Sub
+
+4-89修改未打开的Excel文件中的数据
+Sub 输入()
+Set Conn = CreateObject(“adodb.connection”)
+Set rst = CreateObject(“ADODB.recordset”)
+Conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.Path & “/数据库.xls”
+Sql = “update [Sheet1$] set 年龄=” & [D5] & “,性别='” & [D7] & “‘ where 姓名='” & [D3] & “‘”
+‘设置SQL的方法
+Conn.Execute (Sql) ‘执行SQL方法
+Conn.Close
+Set Conn = Nothing
+MsgBox “数据库的记录已修改”
+End Sub
+
+4-90删除未打开的Excel文件中的数据
+Sub 删除()
+Application.ScreenUpdating = False
+On Error GoTo 100
+Dim mybook As Workbook
+Dim myrange As Range
+Set mybook = GetObject(ThisWorkbook.Path & “/数据库.xls”)
+Set myrange = mybook.Sheets(1).Columns(1).Find([d3])
+myrange.EntireRow.Delete
+Windows(mybook.Name).Visible = True
+mybook.Close True
+MsgBox “已从数据库中删除该记录”
+Set mybook = Nothing
+Set myrange = Nothing
+Exit Sub
+100
+MsgBox “没有找到相关记录”
+Application.ScreenUpdating = True
+End Sub
+
+4-90(附加)提取不是[A2]记录内容
+Sub 删除()
+Dim cnn As New ADODB.Connection
+Dim RST As New ADODB.Recordset
+Dim LastRow%
+Dim Jcount As Integer
+cnn.Open “provider=microsoft.jet.oledb.4.0;extended properties=Excel 8.0;data source=” & ThisWorkbook.FullName
+Sql = “select * from [原始$] where 单据号<>'” & Range(“a2″).Value & ” ‘”
+RST.Open Sql, cnn, adOpenKeyset, adLockOptimistic
+RST.MoveLast
+Jcount = RST.RecordCount
+RST.MoveFirst
+With Sheets(“目的”)
+LastRow = .Range(“A65536”).End(xlUp).Row
+If LastRow > 1 Then .Range(“A2:K” & LastRow).ClearContents
+.Range(“A2”).CopyFromRecordset RST
+End With
+RST.Close
+Set RST = Nothing
+cnn.Close
+End Sub
+
+4-91查找并返回未打开的Excel文件中的数据
+Sub 查找()
+[D5] = “”: [D7] = “”
+Set Conn = CreateObject(“adodb.connection”)
+Set rst = CreateObject(“ADODB.recordset”)
+“Conn.Open “”provider=microsoft.jet.oledb.4.0;extended properties=
+excel 8.0;data source=”” & ThisWorkbook.Path & “”/数据库.xls”””
+“rst.Open “”select * from [Sheet1$] where 姓名='”” & [D3] & “”‘””,
+Conn, adOpenKeyset, adLockOptimistic”
+If rst.RecordCount < 1 Then
+MsgBox “找不到该姓名”
+GoTo 100
+End If
+[D5] = rst.fields(“年龄”)
+[D7] = rst.fields(“性别”)
+MsgBox “查找成功”
+100
+rst.Close
+Conn.Close
+Set rst = Nothing
+Set Conn = Nothing
+End Sub
+
+4-92汇总未打开的Excel文件中的数据
+Sub 分类汇总()
+Dim X As Long
+X = [a65536].End(xlUp).Row + 1
+Range(“A2:G” & X).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.Path & “\数据库.xls”
+Sql = “select 类别,型号,SUM(数量),SUM(金额) from [Sheet1$] GROUP BY 类别,型号”
+[a2].CopyFromRecordset conn.Execute(Sql)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-93筛选多个工作表中相同字段的唯一值
+Sub 筛选唯一值()
+Dim X As Long
+X = [a65536].End(xlUp).Row + 1
+Range(“A2:A” & X).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select 类别 from [Sheet1$] UNION select 类别 from [Sheet2$] UNION select 类别 from [Sheet3$]”
+[a2].CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-94筛选两个工作表中的重复数据
+Sub 合并工作表数据()
+Dim X As Long
+X = [a6536].End(xlUp).Row + 1
+Range(“A2:C” & X).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sql = “select [Sheet2$].类别,[Sheet2$].数量,[Sheet2$].金额 from [Sheet1$],[Sheet2$] where [Sheet1$].类别=[Sheet2$].类别”
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(Sql)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-95筛选两个工作表中的不同数据
+Sub Sheet1中有而Sheet2中没有()
+Range(“A2:A1000”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select Distinct * from [Sheet1$] where 姓名 not in(select 姓名 from [Sheet2$])”
+[a2].CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+Sub Sheet2中有而Sheet1中没有()
+Range(“B2:B1000”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select Distinct 姓名 from [Sheet2$] where 姓名 not in(select 姓名 from [Sheet1$])”
+[B2].CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+Sub 合并不重复的内容()
+Range(“C2:C1000”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select Distinct 姓名 from [Sheet2$] where 姓名 not in(select 姓名 from [Sheet1$]) UNION select Distinct 姓名 from [Sheet1$] where 姓名 not in(select 姓名 from [Sheet2$]) ”
+[C2].CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-96筛选多个工作表中的数据
+Sub 查询()
+Dim MYSTR As String
+Range(“A2:h1000”).ClearContents
+Set CONN = CreateObject(“adodb.connection”)
+CONN.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+For I = 1 To Sheets.Count – 2
+sq1 = sq1 & “select * from [” & Sheets(I).Name & “$] where 工资级别=’6级'” & ” UNION ”
+Next I
+sq1 = Left(sq1, Len(sq1) – 7) ‘<” UNION “>共7个字符
+[a2].CopyFromRecordset CONN.Execute(sq1)
+CONN.Close
+Set CONN = Nothing
+End Sub
+
+4-97模糊筛选工作表中的数据
+Sub 筛选以A开头的记录()
+Range(“A2:C100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select * from [Sheet1$] WHERE 型号 Like ‘A%'”
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+Sub 筛选非A开头的记录()
+Range(“A2:C100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select * from [Sheet1$] WHERE 型号 NOT Like ‘A%'”
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+Sub 筛选以C至G开头的记录()
+Range(“A2:C100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select * from [Sheet1$] WHERE 型号 Like ‘[C-G]%'” ‘括号中的表达式代表任何处在C到G之间的单个字符,如果你想显示那些以A，B或C开头的站点，你可以用下面的查询来实现： LIKE ‘[ABC]%’
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+Sub 筛选以A开头字符长度为5的记录()
+Range(“A2:C100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select * from [Sheet1$] WHERE 型号 Like ‘A____'”
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-98分类汇总所有工作表中的数据
+Sub 分类汇总()
+Range(“A2:E100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName ’调用这个对象的open方法
+sq1 = “select 类别,数量,金额 from [Sheet1$]”
+sq2 = “select 类别,数量,金额 from [Sheet2$]”
+sq3 = “select 类别,数量,金额 from [Sheet3$]”
+sq4 = sq1 & ” UNION ALL ” & sq2 & ” UNION ALL ” & sq3
+sq5 = “select 类别,SUM(数量),SUM(金额) from (” & sq4 & “) GROUP BY 类别”
+[a65536].End(xlUp).Offset(1, 0).CopyFromRecordset conn.Execute(sq5)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-99对两个工作表中相同字段的数据进行运算
+Sub 库存结转()
+Range(“A2:D100”).ClearContents
+Set conn = CreateObject(“adodb.connection”)
+conn.Open “provider=microsoft.jet.oledb.4.0;extended properties=excel 8.0;data source=” & ThisWorkbook.FullName
+Sq1 = “select [入库$].商品名称,[入库$].数量-[出库$].数量,[入库$].单价,([入库$].数量-[出库$].数量)*[入库$].单价 from [入库$],[出库$] WHERE [入库$].商品名称=[出库$].商品名称 ”
+[a2].CopyFromRecordset conn.Execute(Sq1)
+conn.Close
+Set conn = Nothing
+End Sub
+
+4-100向Access数据表中输入数据
+Sub ADO录入方法1()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Mydb.mdb”
+sq1 = “insert into Ruku(商品名称,型号,数量,单价,金额) Values(‘” & [D5].Value & “‘,'” & [D7].Value & “‘,” & [D9] & “,” & [D11] & “,” & [D13] & “)”
+cnn.Execute sq1
+cnn.Close
+Set cnn = Nothing
+End Sub
+
+Sub ADO录入方法2()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Mydb.mdb”
+sq1 = “Select * from Ruku”
+rst.Open sq1, cnn, adOpenKeyset, adLockOptimistic
+rst.AddNew
+rst.Fields(“商品名称”) = [D5]
+rst.Fields(“型号”) = [D7]
+rst.Fields(“数量”) = [D9]
+rst.Fields(“单价”) = [D11]
+rst.Fields(“金额”) = [D13]
+rst.Update
+cnn.Close
+Set cnn = Nothing
+End Sub
+Sub DAO录入方法()
+Dim RS1 As Recordset
+Dim DB1 As Database
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\Mydb.mdb”)
+Set RS1 = DB1.OpenRecordset(Name:=”Ruku”, Type:=dbOpenDynaset)
+With RS1
+.AddNew
+.Fields(“商品名称”) = [D5]
+.Fields(“型号”) = [D7]
+.Fields(“数量”) = [D9]
+.Fields(“单价”) = [D11]
+.Fields(“金额”) = [D13]
+.Update
+.Close
+End With
+DB1.Close
+Set DB1 = Nothing
+Set rst = Nothing
+End Sub
+
+4-101从Access数据表中查询数据
+Sub 查询方法1()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Mydb.mdb” ‘& “;Jet OLEDB:Database Password=” & “123”
+sq1 = “Select * from Ruku where 商品名称='” & [D5] & “‘”
+With rst
+.Open sq1, cnn, adOpenKeyset, adLockOptimistic
+If rst.RecordCount < 1 Then
+MsgBox “找不到该记录”
+Exit Sub
+End If
+[D7] = .Fields(“型号”)
+[D9] = .Fields(“数量”)
+[D11] = .Fields(“单价”)
+[D13] = .Fields(“金额”)
+End With
+MsgBox “查找成功”
+cnn.Close
+Set cnn = Nothing
+End Sub
+Sub 查询方法2()
+Dim RS1 As Recordset
+Dim DB1 As Database
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\Mydb.mdb”)
+Set RS1 = DB1.OpenRecordset(Name:=”Ruku”, Type:=dbOpenDynaset)
+With RS1
+.FindFirst “商品名称='” & [D5] & “‘”
+If RS1.NoMatch = True Then
+MsgBox “找不到该记录”
+Exit Sub
+End If
+[D7] = .Fields(“型号”)
+[D9] = .Fields(“数量”)
+[D11] = .Fields(“单价”)
+[D13] = .Fields(“金额”)
+.Close
+End With
+MsgBox “查找成功”
+DB1.Close
+Set DB1 = Nothing
+Set rst = Nothing
+End Sub
+
+4-102修改Access数据表中的数据
+Sub 修改方法1()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Mydb.mdb” ‘& “;Jet OLEDB:Database Password=” & “123”
+sq1 = “Select * from Ruku where 商品名称='” & [D5] & “‘”
+With rst
+.Open sq1, cnn, adOpenKeyset, adLockOptimistic
+If rst.RecordCount < 1 Then
+MsgBox “找不到该记录”
+Exit Sub
+End If
+.Fields(“型号”) = [D7]
+.Fields(“数量”) = [D9]
+.Fields(“单价”) = [D11]
+.Fields(“金额”) = [D13]
+.Update
+End With
+MsgBox “修改成功”
+cnn.Close
+Set cnn = Nothing
+End Sub
+Sub 修改方法2()
+Dim RS1 As Recordset
+Dim DB1 As Database
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\Mydb.mdb”)
+Set RS1 = DB1.OpenRecordset(Name:=”Ruku”, Type:=dbOpenDynaset)
+With RS1
+.FindFirst “商品名称='” & [D5] & “‘”
+If RS1.NoMatch = True Then
+MsgBox “找不到该记录”
+Exit Sub
+End If
+.Fields(“型号”) = [D7]
+.Fields(“数量”) = [D9]
+.Fields(“单价”) = [D11]
+.Fields(“金额”) = [D13]
+.Update
+.Close
+End With
+MsgBox “修改成功”
+DB1.Close
+Set DB1 = Nothing
+Set rst = Nothing
+End Sub
+4-103删除Access数据表中的数据
+Sub ADO删除方法()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Mydb.mdb”
+sq1 = “delete * from Ruku where 商品名称='” & [D5] & “‘”
+cnn.Execute (sq1)
+‘With rst
+‘ .Open sq1, cnn, adOpenKeyset, adLockOptimistic
+‘ If rst.RecordCount < 1 Then
+‘ MsgBox “找不到该记录”
+‘ cnn.Close
+‘ Set cnn = Nothing
+‘Exit Sub
+‘ End If
+‘ .Delete
+‘ .Update
+‘End With
+MsgBox “删除成功”
+cnn.Close
+Set cnn = Nothing
+End Sub
+Sub DAO删除方法()
+Dim RS1 As Recordset
+Dim DB1 As Database
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\Mydb.mdb”)
+‘ Set RS1 = DB1.OpenRecordset(Name:=”Ruku”, Type:=dbOpenDynaset)
+sq1 = “delete * from Ruku where 商品名称='” & [D5] & “‘”
+DB1.Execute (sq1)
+‘ With RS1
+‘ .FindFirst “商品名称='” & [D5] & “‘”
+‘ If RS1.NoMatch = True Then
+‘ MsgBox “找不到该记录”
+‘ .Close
+‘ DB1.Close
+‘ Set DB1 = Nothing
+‘ Set rst = Nothing
+‘ Exit Sub
+‘ ‘ End If
+‘ .Delete
+‘ .Update
+‘ .Close
+‘ End With
+MsgBox “删除成功”
+DB1.Close
+Set DB1 = Nothing
+Set rst = Nothing
+End Sub
+
+4-104根据时间段从Access数据表中筛选数据
+Sub 按时间段筛选()
+If [L3] = “” Or [L4] = “” Then Exit Sub
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+sq1 = “Select * from Chuku where 出库日期 BetWeEn #” & [L3] & “# AND ” & “#” & [L4] & “#”
+Range(“A2:i1000”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set cnn = Nothing
+End Sub
+
+4-105从Access数据表中筛选前5名的数据
+Sub 筛选最大前5名()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+sq1 = “Select TOP 5 * from Chuku ORDER BY 销售金额 DESC”
+Range(“A2:i1000”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set rst = Nothing
+Set cnn = Nothing
+End Sub
+
+4-106从有密码保护的Access数据中筛选数据
+Sub 筛选含密码的数据库()
+If [L3] = “” Or [L4] = “” Then Exit Sub
+Dim cnn As New ADODB.Connection
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb” & “;Jet OLEDB:Database Password=” & “123”
+sq1 = “Select * from Chuku where 出库日期 Between #” & [L3] & “# AND ” & “#” & [L4] & “#”
+Range(“A2:i1000”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set cnn = Nothing
+End Sub
+
+4-107从多个Access数据表中筛选数据
+Sub 多表筛选()
+If [L3] = “” Or [L4] = “” Then Exit Sub
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String, sq2 As String, sq3 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+sq1 = “Select * from 销售1部 where 出库日期 BetWeEn #” & [L3] & “# AND ” & “#” & [L4] & “#”
+sq2 = “Select * from 销售2部 where 出库日期 BetWeEn #” & [L3] & “# AND ” & “#” & [L4] & “#”
+sq3 = sq1 & ” union all ” & sq2
+Range(“A2:i100”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq3)
+cnn.Close
+Set rst = Nothing
+Set cnn = Nothing
+End Sub
+
+4-108根据多条件筛选Access数据表中的数据
+Sub 多条件筛选()
+Dim cnn As New ADODB.Connection
+Dim sq1 As String, tj As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+tj = ” 物品名称='” & [L3] & “‘And 规格='” & [L4] & “‘And ” & “销售单价>” & [L5]
+sq1 = “Select * from Chuku where” & tj
+Range(“A2:i100”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set rst = Nothing
+Set cnn = Nothing
+End Sub
+
+4-109根据不定数量条件筛选Access数据表中的数据
+Sub 任意多条件筛选()
+If Application.CountA(Range(“L3:L5”)) = 0 Then
+MsgBox “请输入筛选条件”
+Exit Sub
+End If
+Dim cnn As New ADODB.Connection
+Dim sq1 As String, tj As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb” ‘& “;Jet OLEDB:Database Password=” & “123”
+For I = 3 To 5
+If Val(Range(“L” & I)) > 0 Then
+tj = tj & Range(“K” & I) & “>” & Range(“L” & I) & “AND ”
+ElseIf Range(“L” & I) <> “” And Val(Range(“L” & I)) = 0 Then
+tj = tj & Range(“K” & I) & “='” & Range(“L” & I) & “‘AND ”
+End If
+Next I
+tj = Left(tj, Len(tj) – 4)
+sq1 = “Select * from Chuku where ” & tj
+Range(“A2:i100”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set cnn = Nothing
+End Sub
+
+4-110从Access数据表中模糊筛选数据
+Sub 模糊筛选()
+Dim cnn As New ADODB.Connection
+Dim rst As New ADODB.Recordset
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+sq1 = “Select * from Chuku WHERE 物品代码 Like ‘028%'”
+Range(“A2:i1000”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set rst = Nothing
+Set cnn = Nothing
+End Sub
+
+4-111对Access数据表中的数据进行分类汇总
+Sub 分类汇总()
+Dim cnn As New ADODB.Connection
+Dim sq1 As String
+cnn.Open “provider=Microsoft.jet.OLEDB.4.0;data source=” & ThisWorkbook.Path & “\Cangku.mdb”
+sq1 = “Select 物品代码,物品名称,规格,SUM(出库数量),销售单价,SUM(销售金额) from Chuku GROUP BY 物品代码,物品名称,规格,销售单价”
+Range(“A2:D1000”).ClearContents
+[A2].CopyFromRecordset cnn.Execute(sq1)
+cnn.Close
+Set cnn = Nothing
+End Sub
