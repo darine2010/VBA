@@ -1,0 +1,883 @@
+第2章 Excel表格与数据处理
+2.19判断A1:A7单元格数据类型
+Sub 判断单元格数据类型()
+Dim MST As String
+Dim X As Integer
+For X = 1 To 7
+Select Case True
+Case Application.IsText(Cells(X, 1))
+MST = “文本”
+Case Application.IsLogical(Cells(X, 1))
+MST = “逻辑值”
+Case IsEmpty(Cells(X, 1))
+MST = “空值”
+Case IsNumeric(Cells(X, 1))
+MST = “数值”
+Case Application.IsErr(Cells(X, 1))
+MST = “错误值”
+Case IsDate(Cells(X, 1))
+MST = “日期”
+End Select
+MsgBox Cells(X, 1).Address & “的数据类型为:” & MST
+Next X
+End Sub
+
+2.20单元格区域的端点选取
+Sub 选取B列第1个非空单元格()
+If Range(“b1”) = “” Then
+Range(“B1”).End(xlDown).Select
+Else
+Range(“b1”).Select
+End If
+End Sub
+Sub 选取B列最后1个非空单元格()
+Range(“B65536”).End(xlUp).Select
+End Su
+Sub 选取第三5行最左边的值()
+If Range(“A11”) = “” Then
+Range(“A11”).End(xlToRight).Select
+Else
+Range(“A11”).Select
+End If
+End Sub
+Sub 选取第17行最右边非空单元格()
+Range(“iv17”).End(xlToLeft).Select
+End Sub
+
+2.21返回单元格区域的合集和交集
+Sub 单元格合集()
+‘选取A4:D10区域和B:C列的合并区域
+Union(Range(“A4:D10”), Columns(“B:C”)).Select
+End Sub
+Sub 单元格交集()
+‘选取A4:D10区域和B:C列的交汇区域
+Intersect(Range(“A4:D10”), Columns(“B:C”)).Select
+End Sub
+Application.Union 方法 ：返回两个或多个区域的合并区域。
+语法：表达式.Union(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10, Arg11, Arg12, Arg13, Arg14, Arg15, Arg16, Arg17, Arg18, Arg19, Arg20, Arg21, Arg22, Arg23, Arg24, Arg25, Arg26, Arg27, Arg28, Arg29, Arg30)
+表达式 一个代表 Application 对象的变量。
+参数
+名称 必选/可选 数据类型 描述
+Arg 必选 Range 必须指定至少两个 Range 对象。
+返回值：Range
+示例：本示例以公式“=RAND()”填充两个命名区域（“Range1”和“Range2”）的合并区域。
+Visual Basic for Applications
+Worksheets(“Sheet1”).Activate
+Set bigRange = Application.Union(Range(“Range1”), Range(“Range2”))
+bigRange.Formula = “=RAND()”
+
+Application.Intersect 方法 ：返回一个 Range 对象，该对象表示两个或多个区域重叠的矩形区域。
+
+2.22已选取的单元格区域范围和大小
+Sub 选取区域的总行数()
+MsgBox “选取区域的总行数为:” & Selection.Rows.Count _
+& Chr(13) + “选取区域的总列数为:” & Selection.Columns.Count ‘Chr(13)代表回车
+End Sub
+Sub 选取区域第一行的行数()
+MsgBox “选取区域的第一行的行数为:” & Selection.Row
+End Sub
+Sub 选取区域左上角单元格()
+MsgBox Selection.Range(“A1”).Address
+End Sub
+Sub 选取区域右上角单元格()
+MsgBox Cells(Selection.Row, Selection.Column + Selection.Columns.Count – 1).Address
+End Sub
+Sub 选取区域左下角单元格()
+MsgBox Cells(Selection.Row + Selection.Rows.Count – 1, Selection.Column).Address
+End Sub
+Sub 选取区域右下角单元格()
+MsgBox Selection.Cells(Selection.Cells.Count).Address
+End Sub
+
+2.23高亮显示当前行和列
+Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal Target As Range)
+Application.ScreenUpdating = False
+Cells.Interior.ColorIndex = -4142
+Rows(Target.Row).Interior.ColorIndex = 20
+Columns(Target.Column).Interior.ColorIndex = 20
+Application.ScreenUpdating = True
+End Sub
+
+2.24检查单元格中是否含有公式
+Sub 判断单元格中是否含有公式()
+For I = 4 To 10
+If Cells(I, 3).HasFormula Then
+K = K + 1
+End If
+Next I
+MsgBox “该区域中共有” & K & “个单元格含有公式”
+End Sub
+Range.HasFormula 属性 ：如果区域中所有单元格均包含公式，则该属性值为 True；如果所有单元格均不包含公式，则该属性值为 False；其他情况下为 null。Variant 类型，只读。
+语法：表达式.HasFormula
+表达式 一个代表 Range 对象的变量。
+
+2.25判断单元格是否处于隐藏状态
+Sub 判断单元格的隐藏状态()
+For X = 1 To 10
+If Cells(X, 1).EntireRow.Hidden Or Cells(X, 1).EntireColumn.Hidden Then
+MYH = MYH & Cells(X, 1).Address & “、”
+End If
+Next X
+MYH = Left(MYH, Len(MYH) – 1)
+MsgBox “单元格” & MYH & “处于隐藏状态”
+End Sub
+
+2.26批量删除空行
+Sub 删除空行()
+Columns(1).SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
+Range.SpecialCells 方法
+返回一个 Range 对象，该对象代表与指定类型和值匹配的所有单元格。
+语法：表达式.SpecialCells(Type, Value)
+表达式 一个代表 Range 对象的变量。
+参数：名称 必选/可选 数据类型 描述
+Type 必选 XlCellType 要包含的单元格。
+Value 可选 Variant 如果 Type 为 xlCellTypeConstants 或 xlCellTypeFormulas，则该参数可用于确定结果中应包含哪几类单元格。将这些值相加可使此方法返回多种类型的单元格。默认情况下，将选择所有常量或公式，无论类型如何。
+返回值：Range
+说明
+XlCellType 常量 值
+xlCellTypeAllFormatConditions：任意格式单元格 -4172
+xlCellTypeAllValidation：含有验证条件的单元格 -4174
+xlCellTypeBlanks：空单元格 4
+xlCellTypeComments：含有注释的单元格 -4144
+xlCellTypeConstants：含有常量的单元格 2
+xlCellTypeFormulas：含有公式的单元格 -4123
+xlCellTypeLastCell：已用区域中的最后一个单元格 11
+xlCellTypeSameFormatConditions：含有相同格式的单元格 -4173
+xlCellTypeSameValidation：含有相同验证条件的单元格 -4175
+xlCellTypeVisible：所有可见单元格 12
+
+XlSpecialCellsValue 常量 值
+xlErrors 16
+xlLogical 4
+xlNumbers 1
+xlTextValues 2
+示例：本示例选定工作表 Sheet1 中已用区域的最后一个单元格。
+Visual Basic for Applications
+Worksheets(“Sheet1”).Activate
+ActiveSheet.Cells.SpecialCells(xlCellTypeLastCell).Activate
+
+2.27控制重复录入
+Private Sub Worksheet_Change(ByVal Target As Range)
+If Target.Column = 1 Then
+” If Target.Value <> “””” And Application._
+CountIf(Columns(1), Target.Value) > 1 Then”
+MsgBox “请不要重复录入”
+Application.Undo
+End If
+End If
+End Sub
+删除SHEET2重复SHEET1的记录
+Sub 删除SHEET2重复SHEET1()
+
+I = Sheets(“SHEET1”).Range(“B65536”).End(xlUp).Row
+N = Sheets(“SHEET2”).Range(“B65536”).End(xlUp).Row
+
+For Each RNG In Sheets(“SHEET1”).Range(“B1:B” & I)
+For X = 1 To N
+If RNG.Value = Sheets(“SHEET2”).Range(“B” & X).Value Then
+Sheets(“SHEET2”).Range(“B” & X).EntireRow.Delete
+End If
+Next X
+Next RNG
+End Sub
+Range.EntireRow 属性
+返回一个 Range 对象，该对象表示包含指定区域的整行（或多行）。只读。
+语法：表达式.EntireRow
+表达式 一个代表 Range 对象的变量
+
+2.28自动填充公式
+Private Sub Worksheet_Change(ByVal Target As Range)
+Dim X
+X = Target.Row
+If Cells(X, 2) <> “” And Cells(X, 3) <> “” Then
+Cells(X, 4).Formula = “=B” & X & “*C” & X
+End If
+End Sub
+Range.Formula 属性：返回或设置一个 Variant 值，它代表 A1 样式表示法和宏语言中的对象的公式。
+语法：表达式.Formula
+表达式 一个代表 Range 对象的变量。
+说明：此属性对于 OLAP （OLAP：为查询和报表（而不是处理事务）而进行了优化的数据库技术。OLAP 数据是按分级结构组织的，它存储在多维数据集而不是表中。） 数据源无效。
+如果单元格包含一个常量，此属性返回该常量。如果单元格为空，此属性返回一个空字符串。如果单元格包含公式，Formula 属性将该公式作为字符串返回，所用格式与在编辑栏（包括等号）中显示时的格式相同。
+如果将单元格的值或者公式设置为日期类型，则 Microsoft Excel 将检查此单元格的数字格式是否符合日期或者时间格式。如果不符合，Microsoft Excel 将把数字格式设置为默认的短日期格式。
+如果指定区域是一维或二维区域，则可将公式指定为 Visual Basic 中相同维数的数组。同样，也可在 Visual Basic 数组中使用公式。
+如果为多单元格区域设置公式，则会用公式填充该区域所有的单元格。
+示例：此示例设置 Sheet1 中 A1 单元格的公式。
+Visual Basic for Applications
+Worksheets(“Sheet1”).Range(“A1”).Formula = “=$A$4+$A$10”
+
+2.29每隔5行插入一个空行
+Sub 插入空行()
+Dim xx As Integer
+xx = Int([A65536].End(xlUp).Row / 5)
+For I = 1 To xx
+Rows(I * 5 + 1 + K).Insert
+K = K + 1
+Next I
+End Sub
+Sub 删除空行()
+Range(“a:a”).SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
+
+2.30产生不重复随机整数
+Sub 产生不重复随机数()
+Dim MR As Range
+For Each MR In Range(“A1:A10”)
+Do
+MR = Int(Rnd() * 100 + 1)
+Loop Until Application.CountIf(Range(“A1:A10”), MR) = 1
+Next MR
+End Sub
+
+随机制作布产单(见其他文件夹)
+Sub 布产()
+Dim j As Long
+Dim rng As Range
+Dim rng1 As Range
+Dim last As Integer
+Set rng = Range(“iv1”).End(xlToLeft)
+j = Int((5 / (rng.Column – 2)) * 100) ‘设置5个的随机率
+For x = 2 To Range(“a65536”).End(xlUp).Row – 1 ‘行循环
+100: ‘纠错循环
+Range(Cells(x, 3), Cells(x, rng.Column)) = Empty ‘清空当前行
+For i = 3 To rng.Column ‘列循环
+upval = Int((Cells(x, 2) / 5) * 1.3) ‘设置130%上限
+downval = Int((Cells(x, 2) / 5) * 0.7) ‘设置70%下限
+y = Int(Rnd * 100) ‘设置随机率
+If y < j Then ‘判断随机率
+Cells(x, i) = Int(Rnd * (upval – downval + 1) + downval) ‘赋值
+End If
+Next i
+Set rng1 = Range(“iv” & x).End(xlToLeft) ‘取最后的单元格
+last = rng1.Column – 1
+‘重新为最后的单元格赋值
+rng1.Value = Cells(x, 2).Value – Application.Sum(Range(Cells(x, 3), Cells(x, last)))
+If rng1 > upval Or rng1 < downval Then GoTo 100 ‘避免差异过大
+Next x
+MsgBox “完成任务”
+End Sub
+
+2.31重复内容的指定位置查找
+Sub 重复记录的查找()
+Dim X As Integer
+X = Application.CountIf(Columns(“B”), “A”)
+Set MRG = Columns(2).Find(“A”, [B65536])
+MsgBox “共有” & X & “个A，第1个A的地址为:” & MRG.Address
+For Y = 1 To X – 1
+Set MRG = Columns(2).Find(“A”, MRG)
+MsgBox “共有” & X & “个A，第” & Y + 1 & “个A的地址为:” & MRG.Address
+Next Y
+End Sub
+Range.Find 方法 ：在区域中查找特定信息。
+语法：表达式.Find(What, After, LookIn, LookAt, SearchOrder, SearchDirection, MatchCase, MatchByte, SearchFormat)
+表达式 一个代表 Range 对象的变量。
+参数：
+名称 必选/可选 数据类型 描述
+What 必选 Variant 要搜索的数据。可为字符串或任意 Microsoft Excel 数据类型。
+After 可选 Variant 表示搜索过程将从其之后开始进行的单元格。此单元格对应于从用户界面搜索时的活动单元格的位置。请注意：After 必须是区域中的单个单元格。要记住搜索是从该单元格之后开始的；直到此方法绕回到此单元格时，才对其进行搜索。如果不指定该参数，搜索将从区域的左上角的单元格之后开始。
+LookIn 可选 Variant 信息类型。
+LookAt 可选 Variant 可为以下 XlLookAt 常量之一：xlWhole 或 xlPart。
+SearchOrder 可选 Variant 可为以下 XlSearchOrder 常量之一：xlByRows 或 xlByColumns。
+SearchDirection 可选 XlSearchDirection 搜索的方向。
+MatchCase 可选 Variant 如果为 True，则搜索区分大小写。默认值为 False。
+MatchByte 可选 Variant 只在已经选择或安装了双字节语言支持时适用。如果为 True，则双字节字符只与双字节字符匹配。如果为 False，则双字节字符可与其对等的单字节字符匹配。
+SearchFormat 可选 Variant 搜索的格式。
+
+返回值：一个 Range 对象，它代表第一个在其中找到该信息的单元格。
+说明：
+如果未发现匹配项，则返回 Nothing。Find 方法不影响选定区域或当前活动的单元格。
+每次使用此方法后，参数 LookIn、LookAt、SearchOrder 和 MatchByte 的设置都将被保存。如果下次调用此方法时不指定这些参数的值，就使用保存的值。设置这些参数将更改“查找”对话框中的设置，如果省略这些参数，更改“查找”对话框中的设置将更改使用的保存值。要避免出现这一问题，每次使用此方法时请明确设置这些参数。
+使用 FindNext 和 FindPrevious 方法可重复搜索。
+当搜索到指定查找区域的末尾时，此方法将绕回到区域的开始位置继续搜索。发生绕回后，要停止搜索，可保存第一个找到的单元格地址，然后测试后面找到的每个单元格地址是否与其相同。
+若要对单元格进行模式更为复杂的搜索，请结合使用 For Each…Next 语句和 Like 运算符。例如，下列代码在单元格区域 A1:C5 中搜索字体名称以“Cour”开始的单元格。当 Microsoft Excel 找到匹配单元格以后，就将其字体改为 Times New Roman。
+For Each c In [A1:C5] If c.Font.Name Like “Cour*” Then c.Font.Name = “Times New Roman” End If Next
+示例：本示例在第一个工作表的单元格区域 A1:A500 中查找包含值 2 的所有单元格，并将这些单元格的值更改为 5。
+Visual Basic for Applications
+With Worksheets(1).Range(“a1:a500”)
+Set c = .Find(2, lookin:=xlValues)
+If Not c Is Nothing Then
+firstAddress = c.Address
+Do
+c.Value = 5
+Set c = .FindNext(c)
+Loop While Not c Is Nothing And c.Address <> firstAddress
+End If
+End With
+
+2.32相同内容单元格的批量合并与拆分
+Sub 合并单元格()
+Application.DisplayAlerts = False
+On Error Resume Next
+With Selection
+For I = .Count To 1 Step -1
+If .Cells(I) = .Cells(I – 1) And .Cells(I) <> “” Then
+Range(.Cells(I), .Cells(I – 1)).Merge
+End If
+Next I
+End With
+End Sub
+Sub 单元格拆分()
+Dim MR As Range
+Selection.UnMerge
+For Each MR In Selection
+If MR = “” Then
+MR = MR.Offset(-1, 0).Value
+End If
+Next
+End Sub
+Range.Merge 方法 ：由指定的 Range 对象创建合并单元格。
+语法：表达式.Merge(Across)
+表达式 一个代表 Range 对象的变量。
+参数：名称 必选/可选 数据类型 描述
+Across 可选 Variant 如果为 True，则将指定区域中每一行的单元格合并为一个单独的合并单元格。默认值是 False。
+说明：合并区域的值在该区域左上角的单元格中指定
+
+2.33唯一值的提取
+Sub 唯一值提取()
+Dim X As Integer
+X = [A65536].End(xlUp).Row
+Range(“A1:A” & X).AdvancedFilter Action:=xlFilterCopy, CopyToRange:=Range( _
+“B1”), Unique:=True
+
+End Sub
+Range.AdvancedFilter 方法
+基于条件区域从列表中筛选或复制数据。如果初始选定区域为单个单元格，则使用单元格的当前区域。
+语法：表达式.AdvancedFilter(Action, CriteriaRange, CopyToRange, Unique)
+表达式 一个代表 Range 对象的变量。
+参数：
+名称 必选/可选 数据类型 描述
+Action 必选 XlFilterAction XlFilterAction 的常量之一，用于指定是否就地复制或筛选列表。
+CriteriaRange 可选 Variant 条件区域。如果省略该参数，则没有条件限制。
+CopyToRange 可选 Variant 如果 Action 为 xlFilterCopy，则为复制行的目标区域。否则，忽略该参数。
+Unique 可选 Variant 如果为 True，则只筛选唯一记录。如果为 False，则筛选符合条件的所有记录。默认值为 False。
+返回值：Variant
+示例：本示例基于条件区域“Criteria”筛选数据库“Database”。
+Visual Basic for Applications
+Range(“Database”).AdvancedFilter _
+Action:=xlFilterInPlace, _
+CriteriaRange:=Range(“Criteria”)
+。
+
+2.34查找合并单元格地址
+Sub 查找合并单元格位置()
+Dim MRG As Range
+For Each MRG In ActiveSheet.UsedRange
+If MRG.MergeArea.Address <> MRG.Address And MRG.MergeArea.Address <> K Then
+K = MRG.MergeArea.Address
+MsgBox K
+End If
+Next MRG
+End Sub
+Range.MergeArea 属性：返回一个 Range 对象，该对象代表包含指定单元格的合并区域。如果指定的单元格不在合并区域内，则该属性返回指定的单元格。只读。Variant 类型。
+语法：表达式.MergeArea
+表达式 一个代表 Range 对象的变量。
+说明：MergeArea 属性只应用于单个单元格区域。
+示例：本示例为包含单元格 A3 的合并区域赋值。
+Visual Basic for Applications
+Set ma = Range(“a3”).MergeArea
+If ma.Address = “$A$3” Then
+MsgBox “not merged”
+Else
+ma.Cells(1, 1).Value = “42”
+End If
+
+2.35查找合并单元格地址
+Private Sub Workbook_NewSheet(ByVal Sh As Object)
+MsgBox “你不能插入工作表”
+Application.DisplayAlerts = False
+ActiveSheet.Delete
+Application.DisplayAlerts = True
+End Sub
+
+2.36判断工作簿中是否包含指定工作表
+Sub 判断工作表的存在()
+For X = 1 To Sheets.Count
+If Sheets(X).Name = “A” Then
+MsgBox “A工作簿存在”
+Exit Sub
+End If
+Next X
+MsgBox “A工作表不存在”
+End Sub
+
+2.37删除工作簿中所有空白工作表
+Sub 删除空表()
+Application.DisplayAlerts = False
+Dim MSH As Object
+For Each MSH In Sheets
+If Application.CountA(MSH.UsedRange) = 0 And MSH.Shapes.Count = 0 Then
+MSH.Delete
+End If
+Next
+Application.DisplayAlerts = True
+End Sub
+
+2.38禁止修改指定工作表名称
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+If ActiveSheet.Name <> “sheet1” Then
+MsgBox “你无权修改工作表名称!”
+ActiveSheet.Name = “sheet1”
+End If
+End Sub
+
+2.39禁止选定指定工作表之外的工作表
+Private Sub Worksheet_Deactivate()
+Sheets(“只能选取的工作表”).Activate
+End Sub
+
+2.40判断工作表是否被保护
+Sub 判断工作表保护状态()
+If Sheets(“sheet2”).ProtectContents = True Then
+MsgBox “sheet2工作表已被保护”
+Else
+MsgBox “sheet2工作表没有被保护”
+End If
+End Sub
+ProtectContents 属性：如果工作表的内容处于保护状态，则该值为 True。对于图表工作表，这样将保护整个图表。对于工作表，这样将保护每个单元格。Boolean 类型，只读。
+示例：如果 sheet1 的内容处于保护状态，则本示例显示一个消息框。
+If Worksheets(“Sheet1”).ProtectContents = True Then
+MsgBox “The contents of Sheet1 are protected.”
+End If
+
+2.41禁止打印工作表内容
+Private Sub Workbook_BeforePrint(Cancel As Boolean)
+If ActiveSheet.Name = “Sheet1” Then
+MsgBox “你不能打本文件的内容”, 16
+Cancel = True
+End If
+End Sub
+
+2.42批量隐藏除表名”AAA”之外的所有工作表
+Sub 隐藏工作表()
+For X = 1 To Sheets.Count
+If Sheets(X).Name <> “AAA” Then
+Sheets(X).Visible = False
+End If
+Next X
+End Sub
+Sub 取消隐藏()
+For X = 1 To Sheets.Count
+Sheets(X).Visible = True
+Next X
+End Sub
+
+2.43批量添加和删除超级链接
+Sub 添加链接()
+For I = 1 To Sheets.Count – 1
+Cells(I, 1).Value = Sheets(I + 1).Name
+ActiveSheet.Hyperlinks.Add Anchor:=Cells(I, 1), Address:=””, _
+SubAddress:=Cells(I, 1).Value & “!A1”, TextToDisplay:=Cells(I, 1).Value
+Next I
+End Sub
+
+Sub 删除链接()
+Dim X
+For Each X In ActiveSheet.Hyperlinks
+X.Delete
+Next X
+End Sub
+
+Hyperlinks 集合
+参阅属性方法事件特性多个对象
+Hyperlinks
+Hyperlink
+多个对象
+代表工作表或区域的超链接的集合。每个超链接由一个 Hyperlink 对象表示。
+Hyperlinks 集合用法
+可用 Hyperlinks 属性返回 Hyperlinks 集合。下例检查第一张工作表上包含单词“Microsoft”的链接的超链接。
+For Each h in Worksheets(1).Hyperlinks
+If Instr(h.Name, “Microsoft”) <> 0 Then h.Follow
+Next
+可用 Add 方法创建一个超链接，并将其添加到 Hyperlinks 集合中。下例为单元格 E5 新建一个超链接。
+With Worksheets(1)
+.Hyperlinks.Add .Range(“E5”), “http://example.microsoft.com&#8221;
+
+2.44工作表数据清单批量合并
+Sub 合并数据清单()
+Y = [A65536].End(xlUp).Row + 1
+Rows(“2:” & Y).ClearContents
+For I = 1 To Sheets.Count – 1
+X = Sheets(I).[A65536].End(xlUp).Row
+Y = [A65536].End(xlUp).Row + 1
+Sheets(I).Rows(“2:” & X).Copy Cells(Y, 1)
+Range(Cells(Y, 4), Cells(X + Y – 2, 4)) = Sheets(I).Name
+Next I
+MsgBox “数据合并完毕”
+End Sub
+Copy 方法
+应用于 Range 对象的 Copy 方法。
+将单元格区域复制到指定的区域或剪贴板中。
+expression.Copy(Destination)
+expression 必需。该表达式返回一个 Range 对象。
+Destination Variant 类型，可选。指定区域要复制到的目标区域。如果省略该参数，Microsoft Excel 将把该区域复制到剪贴板中。
+
+2.45工作表分别导出为Excel文件
+Sub 导出为Excel文件()
+Application.ScreenUpdating = False
+MM = ThisWorkbook.Path
+CC = Sheets.Count
+For X = 1 To Sheets.Count
+NN = Sheets(X).Name
+Sheets(X).Copy ‘复制表为新工作薄
+ActiveWorkbook.SaveAs MM & “/AAA/” & NN & “.XLS”
+ActiveWorkbook.Close True
+Next X
+Application.ScreenUpdating = True
+End Sub
+Copy 方法：应用于 Chart、Charts、Sheets、Worksheet 和 Worksheets 对象的 Copy 方法。
+将指定工作表复制到工作簿的另一位置。
+expression.Copy(Before, After)
+expression 必需。该表达式返回上面的对象之一。
+Before Variant 类型，可选。指定某工作表，复制的工作表将置于此工作表之前。如果已经指定了 After，则不能指定 Before。
+After Variant 类型，可选。指定某工作表，复制的工作表将置于此工作表之后。如果已经指定了 Before，则不能指定 After。
+说明：如果既未指定 Before 参数也未指定 After 参数，则 Microsoft Excel 将新建一个工作簿，其中将包含复制的工作表。
+
+本示例新建一个工作簿，提示用户输入文件名，然后保存该工作簿。
+SUB 新建工作薄()
+Set NewBook = Workbooks.Add
+Do
+fName = Application.GetSaveAsFilename
+Loop Until fName <> False
+NewBook.SaveAs Filename:=fName
+End Sub
+GetSaveAsFilename 方法
+参阅应用于示例特性显示标准的“另存为”对话框，获取用户文件名，而无须真正保存任何文件。
+expression.GetSaveAsFilename(InitialFilename, FileFilter, FilterIndex, Title, ButtonText)
+expression 必需。该表达式返回一个 Application 对象。
+InitialFilename Variant 类型，可选。指定建议的文件名。如果省略本参数，Microsoft Excel 将活动工作簿的名称作为建议的文件名。
+FileFilter Variant 类型，可选。一个指定文件筛选条件的字符串。
+本字符串由一个文件筛选字符串与 MS-DOS 通配符表达的文件筛选规则说明组成，中间以逗号分隔。每个字符串都在“文件类型”下拉列表框中列出。例如，下列字符串指定两个文件筛选串，文本文件和加载宏：“文本文件 (*.txt)、*.txt、Add-In 文件、(*.xla)、*.xla”。
+要为单个文件筛选类型使用多个 MS-DOS 通配符表达式，需用分号将通配符表达式分开。例如：“Visual Basic 文件 (*.bas; *.txt)、*.bas; *.txt”。
+如果省略本参数，则默认参数值为“所有文件 (*.*),*.*”。
+FilterIndex Variant 类型，可选。指定默认文件筛选条件的索引号，取值范围为 1 到 FileFilter 指定的筛选条件数目之间。如果省略本参数，或者取值大于可用筛选数目，则采用第一个文件筛选条件。
+Title Variant 类型，可选。指定对话框标题。如果省略本参数，则使用默认标题。
+ButtonText Variant 类型，可选。仅用于 Macintosh。
+说明
+本方法返回选定的文件名或用户输入的名称。返回的文件名可能包含路径说明。如果用户取消了对话框，则该值为 False。
+本方法可能更改当前驱动器或文件夹。
+示例：本示例显示文本文件的“另存为”对话框。如果用户选择了一个文件名，则在消息框中显示所选的文件名。
+fileSaveName = Application.GetSaveAsFilename( _
+fileFilter:=”Text Files (*.txt), *.txt”)
+If fileSaveName <> False Then
+MsgBox “Save as ” & fileSaveName
+End If
+
+2.46单元格内动态显示时间
+Dim MB As Boolean
+Sub 计时()
+If MB = True Then
+Range(“C9”) = Time
+Application.OnTime Now + TimeValue(“00:00:01”), “计时”
+Else
+End
+End If
+End Sub
+Sub 启用动态显示()
+MB = True
+计时
+End Sub
+Sub 停止动态显示()
+MB = False
+End Sub
+OnTime 方法：安排一个过程在将来的特定时间运行（既可以是具体指定的某个时间，也可以是指定的一段时间之后）。
+expression.OnTime(EarliestTime, Procedure, LatestTime, Schedule)
+expression 必需。该表达式返回一个 Application 对象。
+EarliestTime Variant 类型，必需。设置过程开始运行的时间。
+Procedure String 类型，必需。设置要运行的过程名。
+LatestTime Variant 类型，可选。过程开始运行的最晚时间。例如，LatestTime 参数设为 EarliestTime + 30，当时间到了 EarliestTime 时，如果由于其他程序处于运行状态 Microsoft Excel 不处于“就绪”、“复制”、“剪切”或“查找”模式，则 Microsoft Excel 将等待 30 秒让第一个过程先结束运行。如果 30 秒内 Microsoft Excel 不能回到“就绪”模式，则不运行此过程。如果省略该参数，Microsoft Excel 将一直等待到可以运行该过程为止。
+Schedule Variant 类型，可选。如果该值为 True,则安排一个新的 OnTime 过程。如果该值为 False，则清除先前设置的过程。默认值为 True。
+说明：使用 Now + TimeValue(time) 可安排经过一段时间（从现在开始计时）之后运行某个过程。使用 TimeValue(time) 可安排某个过程只运行指定的时间。
+示例：本示例设置 15 秒后运行 my_Procedure 过程，从现在开始计时。
+Application.OnTime Now + TimeValue(“00:00:15”), “my_Procedure”
+本示例设置 my_Procedure 在下午 5 点开始运行。
+Application.OnTime TimeValue(“17:00:00”), “my_Procedure”
+本示例撤消前一个示例对 OnTime 的设置。
+Application.OnTime EarliestTime:=TimeValue(“17:00:00″), _
+Procedure:=”my_Procedure”, Schedule:=False
+
+2.47自动导入图片到指定单元格
+Private Sub Worksheet_Change(ByVal Target As Range)
+On Error Resume Next ‘告诉程序:在以下的代码段中可能包含有难以预料的程序错误,如果出现了不起错误则直接执行程序的下一行.
+If Target.Column = 1 And Target <> “” Then
+Dim MPIC As Shape
+For Each MPIC In ActiveSheet.Shapes ‘MPIC是活动工作表的图片
+If MPIC.TopLeftCell.Offset(0, -1).Address = Target.Address Then ‘如果MPIC左上角的单元格向左移动1列的位置和当前单元格相同
+MPIC.Delete ‘条件成立时,MPIC删除
+End If
+Next MPIC
+Set MRG = Target.Offset(0, 1) ‘设MRG为当前单元格的右移一列单元格
+MRG.Select
+ML = MRG.Left
+MT = MRG.Top
+MW = MRG.Width
+MH = MRG.Height
+ActiveSheet.Shapes.AddShape(msoShapeRectangle, ML, MT, MW, MH).Select ‘设置图片框的形状(长宽高)
+On Error GoTo 100
+Selection.ShapeRange.Fill.UserPicture ActiveWorkbook.Path & “\pic\” & Target.Value & “.jpg”
+End
+100:
+Selection.ShapeRange.Fill.UserPicture ActiveWorkbook.Path & “\pic\无图片.jpg”
+End If
+End Sub
+ShapeRange.Fill 属性 ：返回指定形状的 FillFormat 对象或指定图表的 ChartFillFormat 对象，这些对象包含形状或图表的填充格式属性。只读。
+语法：表达式.Fill
+表达式 一个代表 ShapeRange 对象的变量。
+示例：本示例向 myDocument 中添加矩形，然后设置该矩形的填充格式的前景色、背景色和渐变。
+Visual Basic for Applications
+Set myDocument = Worksheets(1)
+With myDocument.Shapes.AddShape(msoShapeRectangle, _
+90, 90, 90, 50).Fill
+.ForeColor.RGB = RGB(128, 0, 0)
+.BackColor.RGB = RGB(170, 170, 170)
+.TwoColorGradient msoGradientHorizontal, 1
+End With
+
+Shapes.AddShape 方法
+返回一个 Shape 对象，该对象表示工作表中的新自选形状。
+语法：表达式.AddShape(Type, Left, Top, Width, Height)
+表达式 一个代表 Shapes 对象的变量。
+参数：
+名称 必选/可选 数据类型 描述
+Type 必选 MsoAutoShapeType 指定要创建的自选形状的类型。
+Left 必选 Single 自选形状边框的左上角相对于文档左上角的位置（以磅为单位）。
+Top 必选 Single 自选形状边框的左上角相对于文档左上角的位置（以磅为单位）。
+Width 必选 Single 自选形状边框的宽度（以磅为单位）。
+Height 必选 Single 自选形状边框的高度（以磅为单位）。
+返回值：Shape
+说明：要更改已添加的自选形状的类型，请设置 AutoShapeType 属性。
+示例：本示例向 myDocument 中添加矩形。
+Visual Basic for Applications
+Set myDocument = Worksheets(1)
+myDocument.Shapes.AddShape msoShapeRectangle, 50, 50, 100, 200
+
+FillFormat.UserPicture 方法 ：用图像填充指定的形状。
+语法：表达式.UserPicture(PictureFile)
+表达式 一个代表 FillFormat 对象的变量。
+参数：
+名称 必选/可选 数据类型 描述
+PictureFile 必选 String 图片文件名。
+
+2.48双面打印程序
+Sub 双面打印()
+On Error Resume Next
+Dim X As Integer, I As Integer, J As Integer
+X = ExecuteExcel4Macro(“Get.Document(50)”)
+For I = 1 To X Step 2
+ActiveSheet.PrintOut From:=I, To:=I
+Next I
+MsgBox “请将另一面打印纸放入到你的打印机”, 0, “打印另一面提示”
+For J = 2 To X Step 2
+ActiveSheet.PrintOut From:=J, To:=J
+Next J
+On Error GoTo 0
+End Sub
+Sub 测试GET函数()
+On Error Resume Next
+For I = 1 To 88
+X = ExecuteExcel4Macro(“Get.Document(” & 50 & “)”)
+MsgBox X
+Next I
+End Sub
+Worksheet.PrintOut 方法 ：打印对象。
+语法：表达式.PrintOut(From, To, Copies, Preview, ActivePrinter, PrintToFile, Collate, PrToFileName, IgnorePrintAreas)
+表达式 一个代表 Worksheet 对象的变量。
+参数：
+名称 必选/可选 数据类型 描述
+From 可选 Variant 打印的开始页号。如果省略此参数，则从起始位置开始打印。
+To 可选 Variant 打印的终止页号。如果省略此参数，则打印至最后一页。
+Copies 可选 Variant 打印份数。如果省略此参数，则只打印一份。
+Preview 可选 Variant 如果为 True，Microsoft Excel 将在打印对象之前调用打印预览。如果为 False（或省略该参数），则立即打印对象。
+ActivePrinter 可选 Variant 设置活动打印机的名称。
+PrintToFile 可选 Variant 如果为 True，则打印到文件。如果没有指定 PrToFileName，Microsoft Excel 将提示用户输入要使用的输出文件的文件名。
+Collate 可选 Variant 如果为 True，则逐份打印多个副本。
+PrToFileName 可选 Variant 如果 PrintToFile 设为 True，则该参数指定要打印到的文件名。
+IgnorePrintAreas 可选 Variant 如果为 True，则忽略打印区域并打印整个对象。
+返回值：Variant
+说明：From 和 To 所描述的“页”指的是要打印的页，并非指定工作表或工作簿中的全部页。
+示例：此示例打印当前活动工作表。
+Visual Basic for Applications
+ActiveSheet.PrintOut
+
+2.49金额大小写转换
+Function daxiao(rg1 As Range)
+rg = Abs(Round(rg1, 2))
+SR1 = IIf(rg = Int(rg), Application.Text(Int(rg), “[DBNum2]”) & “元整”, Application.Text(Int(rg), “[DBNum2]”) & “元”)
+SR2 = Replace(rg * 100, Int(rg), “”)
+SR3 = Choose(Mid(SR2, 1, 1) + 1, “”, “壹角”, “贰角”, “叁角”, “肆角”, “伍角”, “陆角”, “柒角”, “捌角”, “玖角”)
+SR4 = Choose(Mid(SR2, 2, 1) + 1, “”, “壹分”, “贰分”, “叁分”, “肆分”, “伍分”, “陆分”, “柒分”, “捌分”, “玖分”)
+daxiao = IIf(rg1 >= 0, SR1 & SR3 & SR4, “负” & SR1 & SR3 & SR4)
+End Function
+Replace函数：返回一个字符串，该字符串中指定的子字符串已被替换成另一子字符串，并且替换发生的次数也是指定的。
+语法：Replace(expression, find, replace[, start[, count[, compare]]])
+Replace函数语法有如下命名参数：
+部分 描述
+expression 必需的。字符串表达式，包含要替换的子字符串。
+find 必需的。要搜索到的子字符串。
+replace 必需的。用来替换的子字符串。
+start 可选的。在表达式中子字符串搜索的开始位置。如果忽略，假定从1开始。
+count 可选的。子字符串进行替换的次数。如果忽略，缺省值是 –1，它表明进行所有可能的替换。
+compare 可选的。数字值，表示判别子字符串时所用的比较方式。关于其值，请参阅“设置值”部分。
+设置值：
+compare参数的设置值如下：
+常数 值 描述
+vbUseCompareOption –1 使用Option Compare语句的设置值来执行比较。
+vbBinaryCompare 0 执行二进制比较。
+vbTextCompare 1 执行文字比较。
+vbDatabaseCompare 2 仅用于Microsoft Access。基于您的数据库的信息执行比较。
+返回值：Replace的返回值如下：
+如果 Replace返回值
+expression长度为零 零长度字符串(“”)。
+expression为Null 一个错误。
+find长度为零 expression的复本。
+replace长度为零 expression的复本，其中删除了所有出现的find 的字符串。
+start > Len(expression) 长度为零的字符串。
+count is 0 expression的复本。
+说明：Replace函数的返回值是一个字符串，但是，其中从start所指定的位置开始，到expression字符串的结尾处的一段子字符串已经发生过替换动作。并不是原字符串从头到尾的一个复制。
+
+2.50分离文本与数字
+Function FLA(XX)
+Dim I As Integer
+FLA = XX
+For I = 0 To Len(FLA) ‘设I等于0至FLA的字符数
+FLA = Replace(FLA, I, “”) ‘将数字I换成””(空)
+Next I
+End Function
+Function FLB(MR As Range)
+Dim I As Integer
+CC = “”
+For I = 1 To Len(MR)
+If Val(Mid(MR, I, 1)) > 0 Then
+CC = CC & Mid(MR, I, 1)
+End If
+Next I
+FLB = CC
+End Function
+
+2.51考试随机出题
+Sub 随机出题()
+Range(“A2:N100”).ClearContents
+Range(“A1”) = Int(Rnd() * 100 + 1)
+Sheets(“题库”).Rows(Cells(1, 1)).Copy Rows(1)
+For x = 2 To 10
+Do
+Cells(x, 1) = Int(Rnd() * 100 + 1)
+Loop Until x = Application.Match(Cells(x, 1), Columns(1), 0)
+Sheets(“题库”).Rows(Cells(x, 1)).Copy Rows(x)
+Next x
+End Sub
+
+2.52工资表自动分页小计
+Dim rCurrentCell As Range ‘ 每一页之分页小计所在单元格
+Dim r1stSubCell As Range ‘ 小计区域第一个单元格
+Sub 新建分页小计()
+Dim iSubCol As Integer, rSubArea As Range
+Dim hb As HPageBreak
+
+ActiveWindow.View = xlPageBreakPreview ‘ 进入 分页浏览 模式, 以便 EXCEL 正确计页
+Set r1stSubCell = Range(“A5”) ‘ 本例名单从 A5 单元格开始
+iSubCol = 20 ‘ 本例小计项共有 20 列
+
+‘ 避免可能的错误:手工分页符正好与自动分页符重合
+‘ 建议运行前先删除手工分页符
+‘ 本过程可选
+‘For Each hb In ActiveSheet.HPageBreaks
+‘ On Error Resume Next
+‘ If hb.Type = xlPageBreakManual Then hb.Delete
+‘Next
+
+‘ 最后一行插入手工分页符
+ActiveSheet.HPageBreaks.Add Before:=r1stSubCell.End(xlDown).Offset(1, 0)
+
+‘ 测试每一个分页符,
+‘ 如果是自动分页符, 则在其上一行插入一小计行, 而本行纳入下一页
+‘ 否则, 在本行插入一小计行
+For Each hb In ActiveSheet.HPageBreaks
+Set rCurrentCell = hb.Location
+rCurrentCell.Select ‘ 看看先
+
+If hb.Type = xlPageBreakAutomatic Then Set rCurrentCell = rCurrentCell.Offset(-1, 0)
+
+rCurrentCell.EntireRow.Insert
+Set rCurrentCell = rCurrentCell.Offset(-1, 0)
+
+‘ 添加分页小计内容
+With rCurrentCell
+.Value = “本页小计”
+.Font.Bold = True
+
+Set rSubArea = .Offset(0, 1).Resize(1, iSubCol) ‘ 需要填充分页小计公式的区域
+
+‘ 使用 SUBTOTAL 公式的好处是方便扩展, 且不会对已计算区域重复计算(如果可能发生这种情况的话)
+rSubArea.Formula = “=SUBTOTAL(9,” & r1stSubCell.Offset(0, 1).Address(1, 0) & “:” & .Offset(-1, 1).Address(1, 0) & “)”
+
+Set r1stSubCell = .Offset(1, 0)
+End With
+Next
+
+ActiveWindow.View = xlNormalView
+End Sub
+Sub 分页小计()
+Application.ScreenUpdating = False
+删除分计小计
+删除所有分页符
+Dim Lastrow As Integer
+Lastrow = [A65536].End(xlUp).Row
+k = -1
+For Y = 5 + [j4] To Lastrow Step [j4]
+k = k + 1
+Rows(Y + k).Insert
+Cells(Y + k, 1) = “本页小计”
+For J = 2 To 8
+Cells(Y + k, J) = Application.Sum(Range(Cells(Y + k – [j4], J), Cells(Y + k – 1, J)))
+Next J
+ActiveSheet.HPageBreaks.Add Before:=Rows(Y + k + 1)
+Next Y
+Cells(Lastrow + k + 2, 1) = “本页小计”
+For J = 2 To 8
+Cells(Lastrow + k + 2, J) = Application.Sum(Range(Cells(([j4] + 1) * (k + 1) + 5, J), Cells(Lastrow + k + 1, J)))
+Next J
+Application.ScreenUpdating = True
+End Sub
+Sub 删除分计小计()
+For X = 1 To [A65536].End(xlUp).Row
+If Cells(X, 1) = “本页小计” Then Rows(X).Delete
+Next X
+End Sub
+Sub 删除所有分页符()
+On Error Resume Next
+For I = 1 To ActiveSheet.HPageBreaks.Count
+ActiveSheet.HPageBreaks(I).Delete
+Next I
+End Sub
+
+2.5３会计科目代码自动转换
+Private Sub Worksheet_Change(ByVal Target As Range)
+If Target.Column <> 4 Or Target.Row > 18 Then End
+Dim MM As Range
+mrg = Target.Value
+Set MM = Columns(1).Find(mrg, , , xlWhole)
+If MM Is Nothing Then
+End
+Else
+Target.Value = MM.Offset(0, 1).Value
+End If
+End Sub
+
+2.5４动画图表
+Sub 按钮2_单击()
+X = Range(“A65536”).End(xlUp).Row
+Range(“B2:B” & X).ClearContents
+For I = 2 To X
+Do
+Cells(I, 2) = Cells(I, 2) + 1
+VBA.DoEvents ‘让系统执行完上句后,再执行下句
+Loop Until Cells(I, 2) >= Cells(I, 3)
+Next I
+End Sub
+DoEvents 函数：转让控制权，以便让操作系统处理其它的事件。
+语法：DoEvents( )
+说明
+DoEvents 函数会返回一个 Integer，以代表 Visual Basic 独立版本中打开的窗体数目，例如，Visual Basic，专业版，在其它的应用程序中，DoEvents 返回 0。
+DoEvents 会将控制权传给操作系统。当操作系统处理完队列中的事件，并且在 SendKeys 队列中的所有键也都已送出之后，返回控制权。
+DoEvents 对于简化诸如允许用户取消一个已启动的过程 — 例如搜寻一个文件 — 特别有用。对于长时间过程，放弃控制权最好使用定时器或通过委派任务给 ActiveX EXE 部件来完成。以后，任务还是完全独立于应用程序，多任务及时间片由操作系统来处理。
+小心 确保以 DoEvents 放弃控制权的过程，在第一次 DoEvents 返回之前，不能再次被其他部分的代码调用；否则会产生不可预料的结果。此外，如果其它的应用程序可能会和本过程以不可预知的方式进行交互操作，那么也不要使用 DoEvents，因为此时不能放弃控制权。
