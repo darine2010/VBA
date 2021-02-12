@@ -1,0 +1,797 @@
+第3章 Excel窗体与控件
+3-55一次清空所有文本框数据
+Sub 显示窗体()
+UserForm1.Show
+End Sub
+
+Private Sub CommandButton1_Click()
+‘单击按键事件
+On Error Resume Next
+Dim MCO As Object
+For Each MCO In Me.Controls
+MCO.Text = “”
+Next MCO
+End Sub
+
+3-56设置文本框的密码样式
+Sub 显示窗体()
+UserForm1.Show
+End Sub
+Private Sub UserForm_Initialize()
+TextBox1.PasswordChar = “*”
+End Sub
+Private Sub TextBox1_Change()
+[A1] = TextBox1.Value
+End Sub
+
+3-57文本框中只允许录入数字
+Private Sub TextBox1_Change()
+On Error Resume Next
+TT = TextBox1.Text
+X = Right(TT, 1)
+If IsNumeric(X) = False Then
+MsgBox “文本框中只能录入数字!”
+TextBox1.Text = Left(TT, Len(TT) – 1) ‘删除最后一个非数值字符
+End If
+End Sub
+
+3-58文本框输入内容必须包含指定字符A
+Private Sub TextBox1_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+‘退出编辑文本框事件
+If InStr(1, TextBox1.Text, “A”) = 0 Then
+MsgBox “你输入的内容没有包含A!”
+Cancel = True ‘继续编辑TextBox1
+End If
+End Sub
+
+3-59格式化文本框字符和数字
+Private Sub TextBox1_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+TextBox1.Value = Format(TextBox1.Text, “河南省@”)
+End Sub
+Private Sub TextBox2_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+TextBox2.Value = Format(TextBox2.Text, “￥#,##0.00;￥-#,##0.00”)
+End Sub
+Private Sub TextBox3_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+TextBox3.Value = Format(TextBox3.Text, “0000-00-00”)
+End Sub
+
+3-60用微调按钮控制文本框数字显示
+Private Sub SpinButton1_Change()
+TextBox1.Value = SpinButton1.Value ‘通过微调从1开始赋值
+End Sub
+
+Private Sub SpinButton2_SpinDown()
+TextBox2.Value = Val(TextBox2.Value) – 1
+End Sub
+
+Private Sub SpinButton2_SpinUp()
+TextBox2.Value = Val(TextBox2.Value) + 1
+End Sub
+
+3-61锁定文本框
+Private Sub UserForm_Initialize()
+TextBox1.Enabled = False
+TextBox2.Locked = True
+TextBox1.Text = “这一是禁止选取的文本框,你可以试试了”
+TextBox2.Text = “这一个禁止输入和禁止复制的文本框,但可以选取”
+End Sub
+
+3-62设置按钮自动响应Enter和Esc键按下
+Private Sub CommandButton1_Click()
+MsgBox “你按下了回车键,等同于单击了确定按扭”
+End Sub
+
+Private Sub CommandButton2_Click()
+MsgBox “你按下了ESC按键,等于单击退出按钮”
+Unload Me ‘退出窗体编辑
+End Sub
+
+Private Sub UserForm_Initialize()
+CommandButton1.Default = True
+CommandButton2.Cancel = True
+End Sub
+
+3-63鼠标经过按钮时按钮高亮显示
+Private Sub CommandButton1_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+CommandButton1.BackColor = &HFFFF&
+End Sub
+Private Sub CommandButton2_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+CommandButton2.BackColor = &HFFFF&
+End Sub
+
+Private Sub CommandButton3_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+CommandButton3.BackColor = &HFFFF&
+End Sub
+
+Private Sub UserForm_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+CommandButton1.BackColor = &H8000000F
+CommandButton2.BackColor = &H8000000F
+CommandButton3.BackColor = &H8000000F
+End Sub
+
+3-64一个按钮执行两个不同程序
+Private Sub CommandButton1_Click()
+If CommandButton1.Caption = “在文本框输入中国” Then
+A
+Else
+B
+End If
+End Sub
+Sub A()
+CommandButton1.Caption = “在文本框输入China”
+TextBox1.Text = “中国”
+End Sub
+Sub B()
+CommandButton1.Caption = “在文本框输入中国”
+TextBox1.Text = “China”
+End Sub
+
+3-65为按钮批量创建快捷键
+Private Sub CommandButton1_Click()
+TextBox1.Value = “你执行了ABC按钮命令”
+End Sub
+Private Sub CommandButton2_Click()
+TextBox1.Text = “你执行了BCD按钮命令”
+End Sub
+
+Private Sub CommandButton3_Click()
+TextBox1 = “你执行了CDE按钮命令”
+End Sub
+
+Private Sub UserForm_Initialize()
+On Error Resume Next
+Dim mbutton As CommandButton
+For Each mbutton In Me.Controls
+mbutton.Accelerator = Left(mbutton.Caption, 1)
+Next mbutton
+End Sub
+
+3-66两个列表框之间的内容转移
+Private Sub CommandButton1_Click()
+On Error Resume Next
+ListBox2.AddItem ListBox1.Text
+ListBox1.RemoveItem ListBox1.ListIndex
+End Sub
+
+Private Sub CommandButton2_Click()
+On Error Resume Next
+ListBox1.AddItem ListBox2.Text
+ListBox2.RemoveItem ListBox2.ListIndex
+End Sub
+
+Private Sub CommandButton3_Click()
+ListBox2.Clear
+ListBox2.List() = ListBox1.List()
+End Sub
+
+Private Sub CommandButton4_Click()
+ListBox1.Clear
+ListBox1.List() = ListBox2.List()
+End Sub
+
+Private Sub UserForm_Initialize()
+ListBox1.AddItem “张三”
+ListBox1.AddItem “李四”
+ListBox1.AddItem “王五”
+ListBox1.AddItem “李六”
+ListBox1.AddItem “孙七”
+ListBox1.AddItem “赵八”
+ListBox1.AddItem “杨九”
+ListBox1.AddItem “刘十”
+End Sub
+
+3-67利用数组向文本框添加内容
+Private Sub UserForm_Initialize()
+ListBox1.List() = Array(“河南省”, “河北省”, “湖北省”, “湖南省”, “广东省”, “海南省”, “上海市”, “北京市”)
+End Sub
+
+3-68向多列列表框动态添加数据
+Private Sub CommandButton1_Click()
+ListBox1.AddItem ‘添加一行记录.这一句是关键,
+ListBox1.List(ListBox1.ListCount – 1, 0) = TextBox1.Text ‘新添加的一行第一列数据
+ListBox1.List(ListBox1.ListCount – 1, 1) = TextBox2.Text ‘新添加的一行第二列数据
+ListBox1.List(ListBox1.ListCount – 1, 2) = ComboBox1.Text ‘新添加的一行第三列数据
+TextBox1.Text = “”
+TextBox2.Text = “”
+ComboBox1.Text = “”
+End Sub
+
+Private Sub UserForm_Initialize()
+ListBox1.ColumnCount = 3
+ListBox1.AddItem
+ListBox1.List(ListBox1.ListCount – 1, 0) = “姓名”
+ListBox1.List(ListBox1.ListCount – 1, 1) = “年龄”
+ListBox1.List(ListBox1.ListCount – 1, 2) = “性别”
+ComboBox1.AddItem “男”
+ComboBox1.AddItem “女”
+End Sub
+Private Sub TextBox1_Change()
+‘返回ListBox1.ListCount – 1的值
+Dim CNT As Integer
+CNT = ListBox1.ListCount – 1
+Sheets(“SHEET1”).Range(“A1”) = CNT
+End Sub
+
+3-69获取多列组合框的第二列内容
+Private Sub ComboBox1_Change()
+TextBox1.Text = ComboBox1.List(ComboBox1.ListIndex, 1)
+End Sub
+
+Private Sub UserForm_Initialize()
+ComboBox1.RowSource = “Sheet1!$A$1:$B$5”
+End Sub
+
+3-70向组合框中导入不重复内容
+Private Sub UserForm_Initialize()
+Dim I, J
+For I = 1 To Sheets(“SHEET1”).[A65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If Cells(I, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem Cells(I, 1)
+100
+Next I
+End Sub
+
+3-71多个组合框筛选链接
+Private Sub ComboBox1_Change()
+Dim S As String
+Dim X As Integer
+Dim i As Integer
+ComboBox2.Clear
+X = Sheets(“SHEET1”).[a65536].End(xlUp).Row
+S = ComboBox1.Text
+For i = 1 To X
+If Sheets(“sheet1”).Cells(i, 1) = S Then
+ComboBox2.AddItem Sheets(“sheet1”).Cells(i, 1).Offset(0, 1)
+End If
+Next i
+End Sub
+
+Private Sub UserForm_Initialize()
+For i = 2 To Sheets(“SHEET1”).[a65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If Cells(i, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem Cells(i, 1)
+100
+Next i
+End Sub
+
+3-72组合框的智能筛选
+Private Sub ComboBox1_Change()
+On Error Resume Next
+Dim XX()
+Dim ZZ(0)
+WW = ComboBox1.Value
+YY = Application.CountIf(Columns(1), WW & “*”)
+If YY = 0 Then ComboBox1.List() = ZZ
+ReDim XX(YY – 1)
+K = -1
+For I = 1 To Sheets(“SHEET1”).[A65536].End(xlUp).Row
+If Cells(I, 1).Value Like WW & “*” Then
+K = K + 1
+XX(K) = Cells(I, 1).Value
+End If
+Next
+ComboBox1.List() = XX
+ComboBox1.DropDown
+End Sub
+
+3-73用滚动条调节控件显示位置
+Private Sub ScrollBar1_Change()
+Frame1.Top = -ScrollBar1.Value
+End Sub
+Private Sub UserForm_Initialize()
+ScrollBar1.Max = Frame1.Height / 2 + Frame1.Top
+ScrollBar1.Min = -Frame1.Top
+ScrollBar1.SmallChange = Frame1.Height / 10
+End Sub
+
+3-74图形控件的图片加载与删除
+Private Sub CommandButton1_Click()
+Image1.Picture = LoadPicture
+End Sub
+
+Private Sub ListBox1_Click()
+Dim MST As String
+MST = ListBox1.Value
+Image1.Picture = LoadPicture_
+(ThisWorkbook.Path & “\pic\” & MST & “.jpg”)
+End Sub
+
+Private Sub UserForm_Initialize()
+ListBox1.AddItem “莲花”
+ListBox1.AddItem “玫瑰”
+ListBox1.AddItem “鸳鸯”
+Image1.PictureSizeMode = fmPictureSizeModeStretch
+End Sub
+
+单击单元格弹出对应的图片(布领存.XLS)
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+Dim PIC_NAME As String, TAR As String
+On Error Resume Next
+For Each Pi In ActiveSheet.Shapes
+Pi.Delete
+Next Pi
+On Error GoTo 0
+If Selection.Cells.Count = 1 Then
+If Target.Value <> “” And Target.Column = 8 Then
+TAR = Target.Offset(0, -5).Value
+PIC_NAME = Right(TAR, Len(TAR) – 2)
+With ActiveSheet.OLEObjects.Add(ClassType:=”Forms.Image.1″, Link:=False, _
+DisplayAsIcon:=False, Left:=Target.Left + Target.Width, Top:=Target.Top, Width:=110, Height _
+:=120).Object
+.PictureSizeMode = fmPictureSizeModeStretch
+On Error GoTo ERR_ROW
+.Picture = LoadPicture(ThisWorkbook.Path & “\PIC\” & PIC_NAME & “.JPG”)
+End
+ERR_ROW:
+.Picture = LoadPicture(ThisWorkbook.Path & “\PIC\无图片.JPG”)
+End With
+End If
+End If
+On Error GoTo 0
+End Sub
+
+第75例：ListView控件添加新记录
+Private Sub UserForm_Initialize()
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Add 1, , “QQ号”, ListView1.Width / 3
+ListView1.ColumnHeaders.Add 2, , “昵称”, ListView1.Width / 3, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “地区”, ListView1.Width / 3
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For i = 2 To [A65536].End(xlUp).Row
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(i, 1)
+ITM.SubItems(1) = Cells(i, 2)
+ITM.SubItems(2) = Cells(i, 3)
+Next i
+End Sub
+
+第76例：listView控件添加图标
+Private Sub UserForm_Initialize()
+ListView1.Icons = ImageList1
+ListView1.SmallIcons = ImageList1
+ListView1.ColumnHeaderIcons = ImageList1
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Add 1, , “QQ号”, ListView1.Width / 3, , 1
+ListView1.ColumnHeaders.Add 2, , “昵称”, ListView1.Width / 3, lvwColumnCenter, 2
+ListView1.ColumnHeaders.Add 3, , “来自何处”, ListView1.Width / 3, , 3
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For i = 2 To 5
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(i, 1)
+ITM.SubItems(1) = Cells(i, 2)
+ITM.SubItems(2) = Cells(i, 3)
+ITM.Icon = 1
+ITM.SmallIcon = 4
+Next i
+End Sub
+另一例
+Private Sub OptionButton1_Click()
+ListView1.View = lvwIcon
+End Sub
+
+Private Sub OptionButton2_Click()
+ListView1.View = lvwSmallIcon
+End Sub
+
+Private Sub OptionButton3_Click()
+ListView1.View = lvwList
+End Sub
+
+Private Sub OptionButton4_Click()
+ListView1.View = lvwReport
+End Sub
+
+Private Sub UserForm_Initialize()
+ListView1.Icons = ImageList1
+ListView1.SmallIcons = ImageList1
+ListView1.ColumnHeaderIcons = ImageList1
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Add 1, , “QQ号”, ListView1.Width / 3, , 1
+ListView1.ColumnHeaders.Add 2, , “昵称”, ListView1.Width / 3, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “来自何处”, ListView1.Width / 3
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For i = 1 To 5
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(i, 1)
+ITM.SubItems(1) = Cells(i, 2)
+ITM.SubItems(2) = Cells(i, 3)
+ITM.Icon = i
+ITM.SmallIcon = i
+Next i
+End Sub
+
+第77例：listView控件对工作表实现数据筛选
+Private Sub ComboBox1_Change()
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Clear
+ListView1.ListItems.Clear
+ListView1.ColumnHeaders.Add 1, , “省份”, ListView1.Width / 4
+ListView1.ColumnHeaders.Add 2, , “客户”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “销售数量”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 4, , “销售金额”, ListView1.Width / 4, lvwColumnCenter
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For i = 2 To [A65536].End(xlUp).Row
+If Cells(i, 1) = ComboBox1.Text Then
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(i, 1)
+ITM.SubItems(1) = Cells(i, 2)
+ITM.SubItems(2) = Cells(i, 3)
+ITM.SubItems(3) = Cells(i, 4)
+End If
+Next i
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim i, J
+For i = 2 To Sheets(“SHEET1”).[A65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If Cells(i, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem Cells(i, 1)
+100:
+Next i
+ListView1.FullRowSelect = True
+ListView1.MultiSelect = True
+End Sub
+
+第78例：listView控件所有数据输出到工作表
+Private Sub ComboBox1_Change()
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Clear
+ListView1.ListItems.Clear
+ListView1.ColumnHeaders.Add 1, , “省份”, ListView1.Width / 4
+ListView1.ColumnHeaders.Add 2, , “客户”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “销售数量”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 4, , “销售金额”, ListView1.Width / 4, lvwColumnCenter
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+With Sheets(“SHEET1”)
+For I = 2 To .[A65536].End(xlUp).Row
+If .Cells(I, 1) = ComboBox1.Text Then
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = .Cells(I, 1)
+ITM.SubItems(1) = .Cells(I, 2)
+ITM.SubItems(2) = .Cells(I, 3)
+ITM.SubItems(3) = .Cells(I, 4)
+End If
+Next I
+End With
+End Sub
+
+Private Sub CommandButton1_Click()
+Application.ScreenUpdating = False
+Dim I, J
+On Error Resume Next
+Range(“a:d”).ClearContents
+For I = 1 To ListView1.ColumnHeaders.Count
+Cells(1, I) = ListView1.ColumnHeaders(I).Text
+For J = 1 To ListView1.ListItems.Count
+Cells(J + 1, 1) = ListView1.ListItems(J).Text
+Cells(J + 1, I + 1) = ListView1.ListItems(J).SubItems(I)
+Next J
+Next I
+Application.ScreenUpdating = True
+End Sub
+
+Private Sub ListView1_BeforeLabelEdit(Cancel As Integer)
+
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim I, J
+With Sheets(“SHEET1”)
+For I = 2 To .[A65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If .Cells(I, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem .Cells(I, 1)
+100:
+Next I
+End With
+End Sub
+
+第79例：listView控件选取行数据输出到工作表
+Private Sub ListView1_DblClick()
+Dim X As Long
+X = [A65536].End(xlUp).Row + 1
+Cells(X, 1) = ListView1.SelectedItem.Text
+Cells(X, 2) = ListView1.SelectedItem.SubItems(1)
+Cells(X, 4) = ListView1.SelectedItem.SubItems(2)
+End Sub
+
+Private Sub UserForm_Initialize()
+ListView1.FullRowSelect = True
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Add 1, , “商品类别”, ListView1.Width / 3
+ListView1.ColumnHeaders.Add 2, , “商品名称”, ListView1.Width / 3, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “单价”, ListView1.Width / 3, lvwColumnCenter
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+With Sheet1
+For i = 2 To .[A65536].End(xlUp).Row
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = .Cells(i, 1)
+ITM.SubItems(1) = .Cells(i, 2)
+ITM.SubItems(2) = .Cells(i, 3)
+Next i
+Set ITM = Nothing
+End With
+End Sub
+
+第80例：listView控件红色字体合计行设置
+Private Sub ComboBox1_Change()
+Dim ITM As ListItem
+Dim ITM1 As ListItem
+Dim 销量合计, 销售金额合计
+ListView1.ColumnHeaders.Clear
+ListView1.ListItems.Clear
+ListView1.ColumnHeaders.Add 1, , “省份”, ListView1.Width / 5
+ListView1.ColumnHeaders.Add 2, , “客户”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “销售数量”, ListView1.Width / 4, lvwColumnRight
+ListView1.ColumnHeaders.Add 4, , “销售金额”, ListView1.Width / 4, lvwColumnRight
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For I = 2 To [A65536].End(xlUp).Row
+If Cells(I, 1) = ComboBox1.Text Then
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(I, 1)
+ITM.SubItems(1) = Cells(I, 2)
+ITM.SubItems(2) = Format(Cells(I, 3), “#,###.00”)
+ITM.SubItems(3) = Format(Cells(I, 4), “#,###.00”)
+销量合计 = 销量合计 + Cells(I, 3)
+销售金额合计 = 销售金额合计 + Cells(I, 4)
+End If
+Next I
+Set ITM1 = ListView1.ListItems.Add()
+ITM1.Text = “合计”
+ITM1.SubItems(2) = Format(销量合计, “#,###.00”)
+ITM1.SubItems(3) = Format(销售金额合计, “#,###.00”)
+ITM1.ForeColor = RGB(255, 0, 0)
+ITM1.Bold = True
+For x = 1 To ListView1.ColumnHeaders.Count – 1
+ITM1.ListSubItems(x).ForeColor = RGB(255, 0, 0)
+ITM1.ListSubItems(x).Bold = True
+Next
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim I, J
+For I = 2 To Sheets(“SHEET1”).[A65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If Cells(I, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem Cells(I, 1)
+100:
+Next I
+End Sub
+
+第81例：ListView控件记录批量删除
+Private Sub ComboBox1_Change()
+Dim ITM As ListItem
+ListView1.ColumnHeaders.Clear
+ListView1.ListItems.Clear
+ListView1.ColumnHeaders.Add 1, , “省份”, ListView1.Width / 4
+ListView1.ColumnHeaders.Add 2, , “客户”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 3, , “销售数量”, ListView1.Width / 4, lvwColumnCenter
+ListView1.ColumnHeaders.Add 4, , “销售金额”, ListView1.Width / 4, lvwColumnCenter
+ListView1.View = lvwReport
+ListView1.Gridlines = True
+For i = 2 To [A65536].End(xlUp).Row
+If Cells(i, 1) = ComboBox1.Text Then
+Set ITM = ListView1.ListItems.Add()
+ITM.Text = Cells(i, 1)
+ITM.SubItems(1) = Cells(i, 2)
+ITM.SubItems(2) = Cells(i, 3)
+ITM.SubItems(3) = Cells(i, 4)
+End If
+Next i
+End Sub
+
+Private Sub CommandButton1_Click()
+Dim i As Integer
+For i = Me.ListView1.ListItems.Count To 1 Step -1
+If Me.ListView1.ListItems(i).Selected Then
+Me.ListView1.ListItems.Remove i
+End If
+Next i
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim i, J
+For i = 2 To Sheets(“SHEET1”).[A65536].End(xlUp).Row
+For J = 0 To ComboBox1.ListCount – 1
+If Cells(i, 1) = ComboBox1.List(J) Then GoTo 100
+Next J
+ComboBox1.AddItem Cells(i, 1)
+100:
+Next i
+ListView1.FullRowSelect = True
+ListView1.MultiSelect = True
+End Sub
+
+第82例：TreeView控件从工作表中读取数据
+Private Sub UserForm_Initialize()
+Dim Nodx As Node
+TreeView1.ImageList = ImageList1
+Set Nodx = TreeView1.Nodes.Add(, , “总公司”, “总公司人事结构”, 1)
+For X = 2 To Range(“B65536”).End(xlUp).Row
+C1 = Cells(X, 1)
+C2 = Cells(X, 2)
+If Len(Cells(X, 2)) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 2)
+ElseIf Len(Cells(X, 2)) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 1), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 3)
+ElseIf Len(Cells(X, 2)) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 3), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 4)
+End If
+Next
+End Sub
+
+第83例：TreeView控件选取目录的获取
+Private Sub TreeView1_Click()
+Dim MyItem As Node
+Set MyItem = TreeView1.SelectedItem
+If Len(TreeView1.SelectedItem.Key) = 2 Then
+TextBox1 = 截取名称(MyItem.Text)
+TextBox2.Value = “”
+TextBox3.Value = “”
+TextBox4 = Replace(MyItem.Key, “A”, “”)
+ElseIf Len(MyItem.Key) = 4 Then
+TextBox1 = 截取名称(TreeView1.Nodes(MyItem.Parent.Key))
+TextBox2 = 截取名称(MyItem.Text)
+TextBox3.Value = “”
+TextBox4 = Replace(MyItem.Key, “A”, “”)
+ElseIf Len(MyItem.Key) = 7 Then
+TextBox1 = 截取名称(TreeView1.Nodes(MyItem.Parent.Parent.Key))
+TextBox2 = 截取名称(TreeView1.Nodes(MyItem.Parent.Key))
+TextBox3 = 截取名称(MyItem.Text)
+TextBox4 = Replace(MyItem.Key, “A”, “”)
+End If
+End Sub
+Function 截取名称(AAA)
+截取名称 = Left(AAA, InStr(1, AAA, “(“) – 1)
+End Function
+
+Private Sub UserForm_Initialize()
+Dim Nodx As Node
+TreeView1.ImageList = ImageList1
+Set Nodx = TreeView1.Nodes.Add(, , “总公司”, “总公司人事结构”, 1)
+For X = 2 To Range(“B65536”).End(xlUp).Row
+C1 = Cells(X, 1)
+C2 = Cells(X, 2)
+If Len(Cells(X, 2)) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 2)
+ElseIf Len(Cells(X, 2)) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 1), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 3)
+ElseIf Len(Cells(X, 2)) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 3), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 4)
+End If
+Next
+End Sub
+
+第84例：TreeView控件目录的动态添加
+Private Sub CommandButton1_Click()
+Dim Nodx As Node
+On Error GoTo 100
+t1 = TextBox1.Value
+t2 = TextBox2.Value
+MCO = Range(“A65536”).End(xlUp).Row + 1
+Cells(MCO, 1) = t2
+Cells(MCO, 2) = t1
+If Len(t1) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & t1, t2 & “(” & t1 & “)”, 2)
+ElseIf Len(t1) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(t1, 1), tvwChild, “A” & t1, t2 & “(” & t1 & “)”, 3)
+ElseIf Len(t1) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(t1, 3), tvwChild, “A” & t1, t2 & “(” & t1 & “)”, 4)
+End If
+Nodx.EnsureVisible
+Exit Sub
+100:
+MsgBox “你设置的目录重复或上级目录不存在!”
+Cells(MCO, 1) = “”
+Cells(MCO, 2) = “”
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim Nodx As Node
+TreeView1.ImageList = ImageList1
+Set Nodx = TreeView1.Nodes.Add(, , “总公司”, “总公司人事结构”, 1)
+For X = 2 To Range(“B65536”).End(xlUp).Row
+C1 = Cells(X, 1)
+C2 = Cells(X, 2)
+If Len(Cells(X, 2)) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 2)
+ElseIf Len(Cells(X, 2)) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 1), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 3)
+ElseIf Len(Cells(X, 2)) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 3), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 4)
+End If
+Next
+End Sub
+
+第85例：TreeView控件节点的动态修改
+Private Sub CommandButton2_Click()
+Dim Mnode As Node
+Dim MST As String
+Dim dm
+MST = Application.InputBox(“请输入要修改的节点名称”)
+If Len(MST) = 0 Then Exit Sub
+Set Mnode = TreeView1.SelectedItem
+dm = Replace(Mnode.Key, “A”, “”)
+TreeView1.SelectedItem.Text = MST & “(” & dm & “)”
+Cells(Columns(2).Find(dm, LookAt:=xlWhole).Row, 1) = MST
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim Nodx As Node
+TreeView1.ImageList = ImageList1
+Set Nodx = TreeView1.Nodes.Add(, , “总公司”, “总公司人事结构”, 1)
+For X = 2 To Range(“B65536”).End(xlUp).Row
+C1 = Cells(X, 1)
+C2 = Cells(X, 2)
+If Len(Cells(X, 2)) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 2)
+ElseIf Len(Cells(X, 2)) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 1), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 3)
+ElseIf Len(Cells(X, 2)) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 3), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 4)
+End If
+Next
+End Sub
+
+第86例：TreeView控件节点的动态删除
+Private Sub CommandButton2_Click()
+Dim Mnode As Node
+Dim MST As String
+Dim dm
+MST = Application.InputBox(“请输入要修改的节点名称”)
+If Len(MST) = 0 Then Exit Sub
+Set Mnode = TreeView1.SelectedItem
+dm = Replace(Mnode.Key, “A”, “”)
+TreeView1.SelectedItem.Text = MST & “(” & dm & “)”
+Cells(Columns(2).Find(dm, LookAt:=xlWhole).Row, 1) = MST
+End Sub
+
+‘************删除代码***********
+Private Sub CommandButton3_Click()
+Dim xx, yy, I
+yy = TreeView1.SelectedItem.Key
+xx = MsgBox(“你确定要删除选取的节点吗?”, 1)
+If xx = 2 Then Exit Sub
+TreeView1.Nodes.Remove TreeView1.SelectedItem.Index
+For I = Range(“B65536”).End(xlUp).Row To 1 Step -1
+If “A” & Cells(I, 2) Like yy & “*” Then
+Rows(I).Delete
+End If
+Next I
+End Sub
+
+Private Sub TreeView1_BeforeLabelEdit(Cancel As Integer)
+
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim Nodx As Node
+TreeView1.ImageList = ImageList1
+Set Nodx = TreeView1.Nodes.Add(, , “总公司”, “总公司人事结构”, 1)
+For X = 2 To Range(“B65536”).End(xlUp).Row
+C1 = Cells(X, 1)
+C2 = Cells(X, 2)
+If Len(Cells(X, 2)) = 1 Then
+Set Nodx = TreeView1.Nodes.Add(“总公司”, tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 2)
+ElseIf Len(Cells(X, 2)) = 3 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 1), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 3)
+ElseIf Len(Cells(X, 2)) = 6 Then
+Set Nodx = TreeView1.Nodes.Add(“A” & Left(C2, 3), tvwChild, “A” & C2, C1 & “(” & C2 & “)”, 4)
+End If
+Next
+End Sub
