@@ -1,0 +1,3 @@
+Sub 删除空行()
+Columns(1).SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
