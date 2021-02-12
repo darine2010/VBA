@@ -1,0 +1,508 @@
+VBA应用技巧代码的实例代码1
+
+兰色幻想的《VBA应用技巧代码》的实例代码http://club.excelhome.net/viewthread.php?tid=449527&extra=&authorid=201067&page=1
+第一部 《VBA技巧应用》(作者：赵志东)
+第1章 Excel文件与文件夹操作
+
+1.1返回当前Excel文件的路径
+Sub 打开文件B()
+Dim MST As String ‘声明变量
+MST = ThisWorkbook.Path ‘把当前文件的路径赋予MST
+Workbooks.Open MST & “\B.XLS” ‘打开文件B
+End Sub
+Workbooks.Open 路径+名称,打开指定工作薄
+
+1.2返回指定文件夹中的文件列表
+Sub 列出所有文件名()
+Dim xlsFile As String
+‘DIR(路径):此路径下的E文件名集合中的一成员
+xlsFile = Dir(ActiveWorkbook.Path & “\*.XLS”)
+Do
+‘如文件名不含有”汇总”,则
+If InStr(1, xlsFile, “汇总”) = 0 Then
+Cells(([A65536].End(xlUp).Row + 1), 1) = xlsFile
+End If
+xlsFile = Dir
+‘如果UNTIL条件成立,则跳出DO循环
+Loop Until Len(xlsFile) = 0
+End Sub
+Dir[(pathname[, attributes])]，在第一次调用 Dir 函数时，必须指定 pathname，否则会产生错误。如果也指定了文件属性，那么就必须包括 pathname。Dir 会返回匹配 pathname 的第一个文件名。若想得到其它匹配 pathname 的文件名，再一次调用 Dir，且不要使用参数。如果已没有合乎条件的文件，则 Dir 会返回一个零长度字符串 (“”)。一旦返回值为零长度字符串，并要再次调用 Dir 时，就必须指定 pathname，否则会产生错误。不必访问到所有匹配当前 pathname 的文件名，就可以改变到一个新的 pathname 上。但是，不能以递归方式来调用 Dir 函数。以 vbDirectory 属性来调用 Dir 不能连续地返回子目录。
+
+1.3判断文件夹中指定文件是否存在
+Sub 判断AAA文件是否存在()
+Set FS = Application.FileSearch ‘设FS为文件名称
+With FS
+.LookIn = ThisWorkbook.Path ‘确定路径
+.Filename = “AAA.XLS” ‘查找的文件名
+If .Execute() > 0 Then ‘判断查找的结果
+MsgBox “AAA文件存在”
+Else
+MsgBox “AAA文件不存在”
+End If
+End With
+End Sub
+FileSearch 属性：为文件搜索返回一个 FileSearch 对象。
+LookIn 属性：返回或设置在指定的文件搜索过程中要搜索的文件夹
+FileName 属性：返回或设置保存指定源对象位置的 URL（Intranet 或网站上）或路径（本地或网络）。String 类型，可读写。
+Execute 方法：激活与单元格中智能标记类型相关的智能标记操作。语法：expression.Execute，expression 必需。该表达式返回“应用于”列表中的对象之一。
+提取指定文件夹的EXCEL文件名称
+Sub 提取EXCEL文件名称()
+Application.ScreenUpdating = False　‘停止刷新
+MC = ActiveWorkbook.Name
+Dim ss As Workbook
+With Application.FileSearch
+.LookIn = Application.ThisWorkbook.Path + “\文件”
+.Filename = “*.xls”
+If .Execute() > 0 Then
+MsgBox “共有 ” & .FoundFiles.Count & ” 个需要读取的文件 。”, , “读取EXCEL文件名”
+
+For i = 1 To .FoundFiles.Count
+Set ss = Workbooks.Open(.FoundFiles(i), , ReadOnly)
+x = Workbooks(MC).Sheets(“Sheet4”).[A65536].End(xlUp).Row
+bw = InStr(1, ss.Name, “.”)
+bs = Left(ss.Name, bw – 1)
+Workbooks(MC).Sheets(“Sheet4”).Cells(x + 1, 1) = bs
+Workbooks(ss.Name).Close SaveChanges:=False
+
+Next i
+Else
+MsgBox “文件 文件夹中没有需要读取的文件 。”, , “读取EXCEL文件名”
+End If
+End With
+Application.ScreenUpdating = True
+
+End Sub
+FoundFiles 属性: 返回一个 FoundFiles 对象，该对象包括一次查找操作中找到的所有文件的文件名。只读。FoundFiles 对象参阅属性方法事件特性代表由文件查找过程返回的文件列表。使用 FoundFiles 对象用 FoundFiles 属性可返回 FoundFiles 对象。本示例可实现：逐个查看找到的文件列表中的文件并显示其中每个文件的文件名和路径。用 FoundFiles(index) 可返回查找过程中指定文件的名称和位置，此处的 index 是该文件的索引号。
+
+1.4在文件夹之间复制和移动Excel文件
+Sub 复制表1()
+FileCopy ThisWorkbook.Path & “/表1.XLS”, ThisWorkbook.Path & “/目标/表1.XLS”
+End Sub
+Sub 移动表2()
+FileCopy ThisWorkbook.Path & “/表2.XLS”, ThisWorkbook.Path & “/目标/表2.XLS”
+Kill ThisWorkbook.Path & “/表2.XLS”
+End Sub
+注释１：
+FileCopy 语句 :复制一个文件。
+语法:FileCopy source, destination
+FileCopy 语句的语法含有以下这些命名参数的描述
+source 必要参数。字符串表达式，用来表示要被复制的文件名。source 可以包含目录或文件夹、以及驱动器。
+destination 必要参数。字符串表达式，用来指定要复制的目地文件名。destination 可以包含目录或文件夹、以及驱动器。
+说明:如果想要对一个已打开的文件使用 FileCopy 语句，则会产生错误。
+注释２：
+Kill 语句 :从磁盘中删除文件。
+语法:Kill pathname
+必要的 pathname 参数是用来指定一个文件名的字符串表达式。pathname 可以包含目录或文件夹、以及驱动器。
+说明:在 Microsoft Windows 中，Kill 支持多字符 (*) 和单字符 (?) 的统配符来指定多重文件。.
+如果使用 Kill 来删除一个已打开的文件，则会产生错误。
+注意 若要删除目录，使用 RmDir 语句
+
+1.5判断指定文件夹是否存在
+Sub 判断文件夹是否存在()
+Set YYY = CreateObject(“Scripting.FileSystemObject”) ‘设YYY为文件夹对象变量
+If YYY.FolderExists(ThisWorkbook.Path & “\A”) = True Then
+MsgBox “A文件夹存在”
+Else
+MsgBox “A文件夹不存在”
+MkDir ThisWorkbook.Path & “\A”
+End If
+Set YYY = Nothing
+End Sub
+注释１：
+FileExists(路径+文件名)： 检验文件是否存在，返回true,false
+注释２：
+MkDir 语句 :创建一个新的目录或文件夹。
+语法:MkDir path
+必要的 path 参数是用来指定所要创建的目录或文件夹的字符串表达式。path 可以包含驱动器。如果没有指定驱动器，则 MkDir 会在当前驱动器上创建新的目录或文件夹。
+Scripting.FileSystemObject需添加引用的“MIscosoft scripting runtime”，
+
+1.6列示所有子文件夹名称
+Sub ShowFolderList()
+‘运行cmd命令
+‘注消FSO组件：RegSvr32 /u %windir%\SYSTEM32\scrrun.dll
+‘启用FSO命令：RegSvr32 %windir%\SYSTEM32\scrrun.dll
+Dim fs, f, f1, fc, s
+Set fs = CreateObject(“Scripting.FileSystemObject”) ‘创建FileSystemObject对象
+Set f = fs.GetFolder(ThisWorkbook.Path) ‘创建文件夹对象
+Set fc = f.SubFolders ‘取得文件夹集合
+For Each f1 In fc
+s = s & f1.Name
+s = s & vbCrLf ‘在每个文件夹名后加回车和换行符
+Next
+MsgBox s
+End Sub
+注释１：
+GetFolder(路径) 取得目录对象
+注释２：
+SubFolders 属性 :返回一个 Folders 集合，由指定文件夹中包含的所有文件夹组
+成，包括设置了隐藏和系统文件属性的文件夹。object.SubFolders object 应
+为 Folder 对象
+
+1.7文件夹的复制和移动
+Sub 复制A文件夹到C()
+Dim f, fs
+Set fs = CreateObject(“Scripting.FileSystemObject”)
+Set f = fs.GetFolder(ThisWorkbook.Path & “\A”) ‘得到folder对象
+f.Copy (ThisWorkbook.Path & “\C\”) ‘复制文件夹
+MsgBox “复制成功!”
+End Sub
+Sub 移动B文件夹到C()
+Dim f, fs
+Set fs = CreateObject(“Scripting.FileSystemObject”)
+Set f = fs.GetFolder(ThisWorkbook.Path & “\B”) ‘得到folder对象
+f.Move (ThisWorkbook.Path & “\C\”) ‘移动文件夹
+MsgBox “移动成功!”
+End Sub
+注释１：
+Move 方法:将指定工作表移到工作簿的另一位置。
+语法:expression.Move(Before, After)
+expression 必需。该表达式返回“应用于”列表中的对象之一。
+Before Variant 类型，可选。表示某工作表，欲移动的工作表将移到此工作表之前。如果已经指定了 After，则不能指定 Before。
+After Variant 类型，可选。表示某工作表，欲移动的工作表将移到此工作表之后。如果已经指定了 Before，则不能指定 After。
+说明：如果既不指定 Before 参数也不指定 After 参数，则 Microsoft Excel 将新建一个工作簿并将欲移动的工作表移到新工作簿中。
+示例：本示例将 Sheet1 移到当前活动工作簿的 Sheet3 之后。
+Worksheets(“Sheet1”).Move _
+after:=Worksheets(“Sheet3”)
+
+1.8批量删除文件夹
+Sub 批量删除文件夹()
+Dim fs, f, f1, fc
+Set fs = CreateObject(“Scripting.FileSystemObject”) ‘创建FileSystemObject对象
+Set f = fs.GetFolder(ThisWorkbook.Path) ‘创建指定路径文件夹对象
+Set fc = f.SubFolders ‘取得文件夹集合
+For Each f1 In fc
+If InStr(1, f1.Name, “A”) > 0 Then ‘判断文件夹名称中是否包含字符A
+f1.Delete ‘删除文件夹
+MsgBox “删除成功”
+End If
+Next f1
+End Sub
+注释１：
+InStr 函数：返回 Variant (Long)，指定一字符串在另一字符串中最先出现的位置。
+语法 ：InStr([start, ]string1, string2[, compare])
+InStr 函数的语法具有下面的参数：
+部分 说明
+start 可选参数。为数值表达式，设置每次搜索的起点。如果省略，将从第一个字符的位置开始。如果 start 包含 Null，将发生错误。如果指定了 compare 参数，则一定要有 start 参数。
+string1 必要参数。接受搜索的字符串表达式。
+string2 必要参数。被搜索的字符串表达式。
+Compare 可选参数。指定字符串比较。如果 compare 是 Null，将发生错误。如果省略 compare，Option Compare 的设置将决定比较的类型。指定一个有效的LCID (LocaleID) 以在比较中使用与区域有关的规则。
+compare 参数设置为：
+常数 值 描述
+vbUseCompareOption -1 使用Option Compare 语句设置执行一个比较。
+vbBinaryCompare 0 执行一个二进制比较。
+vbTextCompare 1 执行一个按照原文的比较。
+vbDatabaseCompare 2 仅适用于Microsoft Access，执行一个基于数据库中信息的比较。
+返回值：如果 InStr返回 ；string1 为零长度 0 ；string1 为 Null Null string2 为零长度 Start；string2 为 Null Null
+string2 找不到 0 ；在 string1 中找到string2 找到的位置 ；start > string2 0
+说明
+InStrB 函数作用于包含在字符串中的字节数据。所以 InStrB 返回的是字节位置，而不是字符位置。
+
+1.9获取文件夹大小
+Sub 获取文件夹信息()
+Set fs = CreateObject(“Scripting.FileSystemObject”)
+Set f = fs.GetFolder(ThisWorkbook.Path & “\A\”) ‘创建文件夹对象
+S = f.Name & “文件夹的大小为 ” & FormatNumber(f.Size / 1024, 0) & “KB” & vbCrLf ‘得到文件夹大小,vbCrLf 是换行符
+MsgBox S
+End Sub
+注释１：
+FormatNumber函数：返回一个数字格式的表达式。
+语法：FormatNumber(Expression[,NumDigitsAfterDecimal [,IncludeLeadingDigit [,UseParensForNegativeNumbers [,GroupDigits]]]])
+FormatNumber函数语法有如下几部分：
+部分 描述
+Expression 必需的。要被格式化的表达式。
+NumDigitsAfterDecimal 可选的。数字值，表示小数点右边的显示位数。缺省值为–1，表示使用计算机的区域设置值。
+IncludeLeadingDigit 可选的。三态常数，表示小数点前是否显示零。关于其值，请参阅“设置值”部分。
+UseParensForNegativeNumbers 可选的。三态常数，表示是否把负数值放在圆括号内。关于其值，请参阅“设置值”部分。
+GroupDigits 可选的。的三态常数，表示是否用组分隔符对数字分组，组分隔符在计算机的区域设置值中指定。关于其值，请参阅“设置值”部分。
+设置值
+IncludeLeadingDigit、UseParensForNegativeNumbers和GroupDigits参数的设置值如下：
+常数 值 描述
+vbTrue –1 True
+vbFalse 0 False
+vbUseDefault –2 用计算机区域设置值中的设置值。
+说明：当忽略一个或多个选项参数时，被忽略的参数值由计算机的区域设置值提供。
+注意 所有设置值信息都来自“区域设置”的“数字”选项卡。
+
+1-19用U盘系列号做工作薄打开密码
+Private Sub Workbook_Open()
+Call U盘锁代码
+End Sub
+
+Sub U盘锁代码()
+Dim fs, d, s$
+On Error Resume Next
+For i = 3 To 26 ‘26个字母
+Set fs = CreateObject(“scripting.filesystemobjEct”)
+Set d = fs.getdrive(Chr(64 + i) & “:”)
+s = d.SERIALNUMBER ‘取得驱动器的系列号
+Select Case s
+Case “134374432” ‘U盘系列号
+MsgBox “成功打开”
+Exit Sub
+End Select
+Set fs = Nothing
+Set d = Nothing
+Next
+ThisWorkbook.Close False
+End Sub
+注释1：
+
+注释2：
+Workbook.Close 方法 ：关闭对象。
+语法：表达式.Close(SaveChanges, Filename, RouteWorkbook)
+表达式 一个代表 Workbook 对象的变量。
+参数
+名称 必选/可选 数据类型 描述
+SaveChanges 可选 Variant 如果工作簿中没有改动，则忽略此参数。如果工作簿中有改动但工作簿显示在其他打开的窗口中，则忽略此参数。如果工作簿中有改动且工作簿未显示在任何其他打开的窗口中，则由此参数指定是否应保存更改。如果设为 True，则保存对工作簿所做的更改。如果工作簿尚未命名，则使用 FileName。如果省略 Filename，则要求用户提供文件名。
+Filename 可选 Variant 以此文件名保存所做的更改。
+RouteWorkbook 可选 Variant 如果工作簿不需要传送给下一个收件人（没有传送名单或已经传送），则忽略此参数。否则，Microsoft Excel 根据此参数的值传送工作簿。如果设为 True，则将工作簿传送给下一个收件人。如果设为 False，则不发送工作簿。如果忽略，则要求用户确认是否发送工作簿。
+说明：从 Visual Basic 关闭工作簿并不运行该工作簿中的任何 Auto_Close 宏。使用 RunAutoMacros 方法可运行自动关闭宏。
+示例：此示例关闭 Book1.xls，并放弃所有对此工作簿的更改。
+Visual Basic for Applications
+Workbooks(“BOOK1.XLS”).Close SaveChanges:=False
+获取所有磁盘序列
+Sub 获取所有磁盘序列号()
+Dim fs, d, aa As String, b As String, c As String
+Set fs = CreateObject(“Scripting.FileSystemObject”)
+On Error Resume Next
+For i = 1 To 26
+bb:
+aa = “ABCDEFGHIJKLMNOPQRSTUVWXYZ”
+b = Mid(aa, i, 1)
+Set d = fs.getdrive(fs.GetDriveName(fs.GetAbsolutePathName(b & “:”)))
+If Err.Number = 68 Then
+s = b & “:盘未准备好”
+Err.Clear
+GoTo aa
+End If
+Select Case d.DriveType
+Case 0: t = “Unknown”
+Case 1: t = “Removable”
+Case 2: t = “Fixed”
+Case 3: t = “Network”
+Case 4: t = “CD-ROM”
+Case 5: t = “RAM Disk”
+End Select
+s = “磁盘: ” & d.DriveLetter & ” 类型:” & t & ” 序列号: ” & d.SERIALNUMBER
+aa:
+c = c & s & Chr(10)
+
+Next i
+MsgBox c, 64, “andysky提示你”
+End Sub
+
+改进型U盘锁保护
+Sub U盘锁()
+Dim fs, s$
+On Error Resume Next
+Set fs = CreateObject(“scripting.filesystemobjEct”)
+For Each DRI In fs.DRIVES
+s = DRI.SERIALNUMBER
+If s = “134374432” Then ‘U盘系列号
+MsgBox “打开成功”
+Set fs = Nothing
+Exit Sub
+End If
+Next
+Set fs = Nothing
+MsgBox “打开失败”
+ThisWorkbook.Close False
+End Sub
+
+1.10用程序打开指定文件夹
+Sub 打开指定文件夹()
+Dim Ret
+Ret = Shell(＂explorer.exe＂ & ThisWorkbook.Path & “\A\”, vbNormalFocus)
+End Sub
+Shell 函数：执行一个可执行文件，返回一个 Variant (Double)，如果成功的话，代表这个程序的任务 ID，若不成功，则会返回 0。
+语法：Shell(pathname[,windowstyle])
+Shell 函数的语法含有下面这些命名参数：
+部分 描述
+pathname 必要参数。Variant (String)，要执行的程序名，以及任何必需的参数或命令行变量，可能还包括目录或文件夹，以及驱动器。在Macintosh中，可以使用MacID函数来指定一个应用程序的署名而不是名称。下面的例子使用了Microsoft Word的署名: Shell MacID(“MSWD”)
+Windowstyle 可选参数。Variant (Integer)，表示在程序运行时窗口的样式。如果 windowstyle 省略，则程序是以具有焦点的最小化窗口来执行的。在Macintosh（系统7.0或更高）中，windowstyle仅决定当应用程序运行时是否获得焦点。
+windowstyle 命名参数有以下这些值：
+常量 值 描述
+vbHide 0 窗口被隐藏，且焦点会移到隐式窗口。常数vbHide在Macintosh平台不可用。
+VbNormalFocus 1 窗口具有焦点，且会还原到它原来的大小和位置。
+VbMinimizedFocus 2 窗口会以一个具有焦点的图标来显示。
+VbMaximizedFocus 3 窗口是一个具有焦点的最大化窗口。
+VbNormalNoFocus 4 窗口会被还原到最近使用的大小和位置，而当前活动的窗口仍然保持活动。
+VbMinimizedNoFocus 6 窗口会以一个图标来显示。而当前活动的的窗口仍然保持活动。
+说明
+如果 Shell 函数成功地执行了所要执行的文件，则它会返回程序的任务 ID。任务 ID 是一个唯一的数值，用来指明正在运行的程序。如果 Shell 函数不能打开命名的程序，则会产生错误。
+在Macintosh中，vbNormalFocus、vbMinimizedFocus和vbMaximizedFocus都将应用程序置于前台；vbHide、vbNoFocus、vbMinimizeFocus都将应用程序置于后台。
+注意 缺省情况下，Shell 函数是以异步方式来执行其它程序的。也就是说，用 Shell 启动的程序可能还没有完成执行过程，就已经执行到 Shell 函数之后的语句。
+
+1.11用程序创建桌面快捷方式
+Sub 创建桌面快捷方式()
+Dim myPath As String
+Set myWshc = CreateObject(“Wscript.Shell”)
+myPath = myWshc.SpecialFolders(“Desktop”)
+‘指定快捷方式名称
+Set mySht = myWshc.CreateShortcut(myPath & “\我的快捷方式.lnk”)
+With mySht
+.TargetPath = ThisWorkbook.FullName ‘指定档案的路径
+.IconLocation = ThisWorkbook.Path & “\SS.ICO” ‘设定图标
+.Save
+End With
+Set mySht = Nothing
+Set myWshc = Nothing
+End Sub
+
+1.12判断指定Excel文件是否打开
+Sub 判断A文件是否已打开()
+Dim X As Integer, Y As Integer
+X = Workbooks.Count ‘得到已打开的工作簿数量
+For Y = 1 To X ‘在所有工作簿之间进行循环
+If Workbooks(X).Name = “A.xls” Then ‘判断工作簿名称是否为”A.xls”
+MsgBox “A文件已打开”
+Exit Sub
+End If
+Next Y
+MsgBox “A文件没有打开”
+End Sub
+
+1.13Excel文件打开时播放音乐
+Private Declare Function PlaySound Lib “winmm.dll” Alias “PlaySoundA” (ByVal lpszName As String, ByVal hModule As Long, ByVal dwFlags As Long) As Long
+Private Sub Workbook_Open()
+Call PlaySound(ThisWorkbook.Path & “\启动.wav”, 0&, &H1)
+End Sub
+
+1.14定时“自杀”的Excel文件
+Private Sub Workbook_Open()
+If Now() >= #9/15/2006# Then ‘时间格式必须在前后加“#”号
+ActiveWorkbook.ChangeFileAccess xlReadOnly
+Kill ActiveWorkbook.FullName
+Application.Quit
+End If
+End Sub
+Workbook.ChangeFileAccess 方法 ：更改工作簿的访问权限。本方法需要从磁盘加载工作簿的更新版本。
+语法：表达式.ChangeFileAccess(Mode, WritePassword, Notify)
+表达式 一个代表 Workbook 对象的变量。
+参数
+名称 必选/可选 数据类型 描述
+Mode 必选 XlFileAccess 指定新的访问模式。
+WritePassword 可选 Variant 如果文件设置了写保护并且 Mode 为 xlReadWrite，则指定写保护密码。如果文件没有密码或 Mode 为 xlReadOnly，则忽略此参数。
+Notify 可选 Variant 如果该值为 True（或省略该参数），则当无法立即访问文件时通知用户。
+说明：如果以只读模式打开文件，则不可独占访问此文件。如果将此文件从只读更改为可读写，Microsoft Excel 必须载入该文件的新副本以确认在以只读模式打开该文件后没有进行过更改。
+示例：本示例将活动工作簿设为只读。
+Visual Basic for Applications
+ActiveWorkbook.ChangeFileAccess Mode:=xlReadOnly
+
+1.14a Code 2
+Sub auto_open()
+Application.DisplayAlerts = False
+If Date >= #6/23/2008# Then
+ActiveWorkbook.ChangeFileAccess xlReadOnly
+Kill ActiveWorkbook.FullName
+Application.Quit
+End If
+End Sub
+
+1.15限制Excel文件使用的次数
+Private Sub Workbook_Open()
+AAA = GetSetting(appname:=”MyApp”, section:=”Startup”, key:=”使用次数”, Default:=1)
+MsgBox “你还可以使用的次数为” & (20 – AAA) & “次,请尽快和作者联系!”
+If AAA = 20 Then
+DeleteSetting “MyApp”, “Startup”
+MsgBox “系统将被删除,感谢您的试用!再见”
+ActiveWorkbook.ChangeFileAccess xlReadOnly
+Kill ActiveWorkbook.FullName
+ThisWorkbook.Close False
+End If
+AAA = AAA + 1
+SaveSetting “MyApp”, “Startup”, “使用次数”, AAA
+End Sub
+参见实例三_54
+
+1.16批量创建Excel文件
+Sub 批量创建Excel文件()
+Application.ScreenUpdating = False
+Dim MBOOK As Workbook, acbook As Workbook
+Dim x As Integer
+mypath = ThisWorkbook.Path
+Set acbook = ThisWorkbook
+For x = 2 To 13
+Set MBOOK = Workbooks.Add
+MBOOK.SaveAs mypath & “\” & acbook.Sheets(“sheet1”).Cells(x, 1) & “.xls”
+MBOOK.Close
+Next x
+MsgBox “创建成功”
+Application.ScreenUpdating = False
+END SUB
+Workbook.SaveAs 方法：在另一不同文件中保存对工作簿所做的更改。
+语法:表达式.SaveAs(FileName, FileFormat, Password, WriteResPassword, ReadOnlyRecommended, CreateBackup, AccessMode, ConflictResolution, AddToMru, TextCodepage, TextVisualLayout, Local)
+表达式 一个代表 Workbook 对象的变量。
+参数
+名称 必选/可选 数据类型 描述
+Filename 可选 Variant 一个表示要保存文件的文件名的字符串。可包含完整路径，如果不指定路径，Microsoft Excel 将文件保存到当前文件夹中。
+FileFormat 可选 Variant 保存文件时使用的文件格式。要查看有效的选项列表，请参阅 FileFormat 属性。对于现有文件，默认采用上一次指定的文件格式；对于新文件，默认采用当前所用 Excel 版本的格式。
+Password 可选 Variant 它是一个区分大小写的字符串（最长不超过 15 个字符），用于指定文件的保护密码。
+WriteResPassword 可选 Variant 一个表示文件写保护密码的字符串。如果文件保存时带有密码，但打开文件时不输入密码，则该文件以只读方式打开。
+ReadOnlyRecommended 可选 Variant 如果为 True，则在打开文件时显示一条消息，提示该文件以只读方式打开。
+CreateBackup 可选 Variant 如果为 True，则创建备份文件。
+AccessMode 可选 XlSaveAsAccessMode 工作簿的访问模式。
+ConflictResolution 可选 Variant 一个 XlSaveConflictResolution 值，它确定该方法在保存工作簿时如何解决冲突。如果设为 xlUserResolution，则显示冲突解决对话框。如果设为 xlLocalSessionChanges，则自动接受本地用户的更改。如果设为 xlOtherSessionChanges，则自动接受来自其他会话的更改（而不是本地用户的更改）。如果省略此参数，则显示冲突处理对话框。
+AddToMru 可选 Variant 如果为 True，则将该工作簿添加到最近使用的文件列表中。默认值为 False。
+Local 可选 Variant 不在美国英语版的 Microsoft Excel 中使用。
+TextVisualLayout 可选 Variant 不在美国英语版的 Microsoft Excel 中使用。
+Local 可选 Variant 如果为 True，则以 Microsoft Excel（包括控制面板设置）的语言保存文件。如果为 False（默认值），则以 Visual Basic for Applications (VBA) （Visual Basic for Applications (VBA)：Microsoft Visual Basic 的宏语言版本，用于编写基于 Microsoft Windows 的应用程序，内置于多个 Microsoft 程序中。） 的语言保存文件，其中 Visual Basic for Applications (VBA) 通常为美国英语版本，除非从中运行 Workbooks.Open 的 VBA 项目是旧的已国际化的 XL5/95 VBA 项目。
+
+说明:请使用同时包含大小写字母、数字和符号的强密码。弱密码不混合使用这些元素。强密码：Y6dh!et5。弱密码：House27。请使用您可以记住的强密码，这样就不必将它写下来。
+
+示例:本示例新建一个工作簿，提示用户输入文件名，然后保存该工作簿。
+Visual Basic for Applications
+Set NewBook = Workbooks.Add
+Do
+fName = Application.GetSaveAsFilename
+Loop Until fName <> False
+NewBook.SaveAs Filename:=fName
+
+1.17禁用宏则关闭Excel文件
+=ERROR(FALSE)
+=RUN(“MY”)
+=IF(ISERROR($A$3))
+=GOTO($A$11)
+=END.IF()
+=ERROR(TRUE)
+=RETURN()
+
+=ALERT(“对不起!由于禁用了宏,本文件自动关闭!”,3)
+=FILE.CLOSE(FALSE)
+=RETURN()
+禁用宏则关闭Excel文件
+‘不要删除
+Function MY()
+End Function
+
+1.18只能自已电脑上使用的Excel文件
+Private Sub Workbook_Open()
+Application.ScreenUpdating = False
+On Error GoTo 100
+Workbooks.Open ThisWorkbook.Path & “/验证.XLS”
+ActiveWorkbook.Close False
+Exit Sub
+100:
+MsgBox “你无法使用该文件,请与文件作者联系”
+ThisWorkbook.Close False
+Application.ScreenUpdating = True
+End Sub
+
+禁用了宏自动关闭工作薄
+Function MY()
+
+End Function
+
+=ERROR(FALSE)
+=RUN(“MY”)
+=IF(ISERROR($A$3))
+=GOTO($A$11)
+=END.IF()
+=ERROR(TRUE)
+=RETURN()
+
+=ALERT(“对不起!由于禁用了宏,本文件将自动关闭!”,3)
+=FILE.CLOSE(FALSE)
+=RETURN()
+
+Share this:
