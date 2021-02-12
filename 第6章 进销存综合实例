@@ -1,0 +1,251 @@
+第6章 进销存综合实例
+6-127用户登录
+Private Sub CommandButton1_Click()
+If ComboBox1.Text = “” Or TextBox1.Text = “” Then
+MsgBox “请填写齐全”, 1 + 64, “系统登陆”
+TextBox1.SetFocus
+Else
+
+If 取操作员密码(ComboBox1.Value) = TextBox1.Text Then
+AAA = ComboBox1.Value
+Unload Me
+MsgBox ComboBox1.Text & “你好!欢迎你进入本系统”, 1 + 64, “欢迎词”
+Application.DisplayStatusBar = True
+Application.StatusBar = “今天是” & Format(Date, “YYYY年M月D日,”) & “当前操作员:” & Me.ComboBox1.Value
+Unload Me
+Application.Visible = True
+Else
+MsgBox “登陆密码错误,请重新输入”
+End If
+End If
+End Sub
+Private Sub CommandButton2_Click()
+Unload Me
+Application.Visible = True
+ActiveWorkbook.Close SAVECHANGES:=False
+End Sub
+Private Sub UserForm_Initialize()
+
+操作员 Me.ComboBox1
+
+End Sub
+
+Private Sub Userform_QueryClose(Cancel As Integer, CloseMode As Integer)
+If CloseMode = 0 Then Cancel = 1
+End Sub
+
+Sub 操作员(XXX As Object)
+Dim RS1 As Recordset
+Dim DB1 As Database
+Dim I As Integer
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.MoveLast
+RS1.MoveFirst
+For I = 1 To RS1.RecordCount
+XXX.AddItem RS1.Fields(“操作员”)
+RS1.MoveNext
+Next I
+RS1.Close
+DB1.Close
+End Sub
+Function 取操作员密码(XXX As String)
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.FindFirst “操作员='” & XXX & “‘”
+
+取操作员密码 = RS1.Fields(“密码”).Value
+RS1.Close
+Set RS1 = Nothing
+Set DB1 = Nothing
+End Function
+
+6-129用户管理
+Public aaa
+Function 取操作员密码(XXX As String)
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.FindFirst “操作员='” & XXX & “‘”
+
+取操作员密码 = RS1.Fields(“密码”).Value
+RS1.Close
+Set RS1 = Nothing
+Set DB1 = Nothing
+End Function
+
+Sub 操作员(XXX As Object)
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Dim I As Integer
+Dim J As Integer
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.MoveLast
+RS1.MoveFirst
+
+For I = 1 To RS1.RecordCount
+XXX.AddItem RS1.Fields(“操作员”)
+RS1.MoveNext
+Next I
+RS1.Close
+DB1.Close
+
+Exit Sub
+100
+DB1.Close
+End Sub
+
+Private Sub CommandButton1_Click()
+If ComboBox1.Text = “” Or TextBox1.Text = “” Then
+MsgBox “请填写齐全”, 1 + 64, “系统提示”
+TextBox1.SetFocus
+Else
+If 取操作员密码(ComboBox1.Text) = TextBox1.Text Then
+MsgBox “更换操作员成功”, 1 + 64, “系统提示”
+Application.StatusBar = “今天是” & Format(Date, “YYYY年M月D日,”) & “当前操作员:” & Me.ComboBox1.Value
+aaa = ComboBox1.Text
+Unload Me
+Else
+MsgBox “密码输入错误,更换操作员失败!”, 1 + 64, “系统提示”
+End If
+End If
+End Sub
+
+Private Sub CommandButton2_Click()
+Unload Me
+Application.Visible = True
+End Sub
+
+Private Sub UserForm_Initialize()
+On Error Resume Next
+操作员 Me.ComboBox1
+End Sub
+
+Private Sub ListBox1_Click()
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.FindFirst “操作员='” & ListBox1.Text & “‘”
+CheckBox1.Value = IIf(RS1.Fields(“入库单制单”).Value = 0, 0, 1)
+CheckBox2.Value = IIf(RS1.Fields(“入库单删除”).Value = 0, 0, 1)
+CheckBox3.Value = IIf(RS1.Fields(“入库单审核”).Value = 0, 0, 1)
+CheckBox4.Value = IIf(RS1.Fields(“出库单删除”).Value = 0, 0, 1)
+CheckBox5.Value = IIf(RS1.Fields(“出库单制单”).Value = 0, 0, 1)
+CheckBox6.Value = IIf(RS1.Fields(“出库单审核”).Value = 0, 0, 1)
+CheckBox7.Value = IIf(RS1.Fields(“调拨单审核”).Value = 0, 0, 1)
+CheckBox8.Value = IIf(RS1.Fields(“调拨单删除”).Value = 0, 0, 1)
+CheckBox9.Value = IIf(RS1.Fields(“调拨单制单”).Value = 0, 0, 1)
+CheckBox10.Value = IIf(RS1.Fields(“入库查询”).Value = 0, 0, 1)
+CheckBox11.Value = IIf(RS1.Fields(“出库查询”).Value = 0, 0, 1)
+CheckBox12.Value = IIf(RS1.Fields(“库存查询”).Value = 0, 0, 1)
+CheckBox13.Value = IIf(RS1.Fields(“展厅销售表”).Value = 0, 0, 1)
+CheckBox14.Value = IIf(RS1.Fields(“往来余额表”).Value = 0, 0, 1)
+CheckBox15.Value = IIf(RS1.Fields(“提成表”).Value = 0, 0, 1)
+CheckBox16.Value = IIf(RS1.Fields(“成本结转表”).Value = 0, 0, 1)
+CheckBox17.Value = IIf(RS1.Fields(“赠送汇总表”).Value = 0, 0, 1)
+CheckBox18.Value = 0
+CheckBox20.Value = IIf(RS1.Fields(“留2”).Value = 0, 0, 1)
+CheckBox21.Value = IIf(RS1.Fields(“留3”).Value = 0, 0, 1)
+CheckBox22.Value = IIf(RS1.Fields(“权限设置”).Value = 0, 0, 1)
+CheckBox23.Value = IIf(RS1.Fields(“基础信息设置”).Value = 0, 0, 1)
+CheckBox24.Value = IIf(RS1.Fields(“数据库备份”).Value = 0, 0, 1)
+RS1.Close
+Set RS1 = Nothing
+Set DB1 = Nothing
+End Sub
+
+Private Sub UserForm_Initialize()
+‘查询权限设置
+For I = 1 To 24
+Me.Controls(“CheckBox” & I).Value = 0
+Next I
+操作员 ListBox1
+End Sub
+Sub 查询权限设置()
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.FindFirst “操作员='” & aaa & “‘”
+If RS1.Fields(“权限设置”).Value = 0 Then
+‘ CommandButton1.Enabled = False
+‘ CommandButton2.Enabled = False
+‘ CommandButton3.Enabled = False
+Else
+‘ CommandButton1.Enabled = True
+‘ CommandButton2.Enabled = True
+CommandButton3.Enabled = True
+RS1.Close
+DB1.Close
+Set DB1 = Nothing
+Set RS1 = Nothing
+End If
+End Sub
+
+Private Sub CommandButton1_Click()
+Dim BBB As String
+BBB = 取操作员密码(ComboBox1.Text)
+
+If TextBox1.Text = “” Or TextBox2.Text = “” Or TextBox3.Text = “” Then
+MsgBox “更改信息不齐全!”, 1 + 64, “系统提示”
+Else
+If BBB = TextBox1.Text Then
+If TextBox3.Text = TextBox2.Text Then
+Dim RS1 As Recordset
+Dim DB1 As Database
+
+Set DB1 = OpenDatabase(ThisWorkbook.Path & “\” & “CangKu.MDB”)
+Set RS1 = DB1.OpenRecordset(Name:=”CaoZuoYuan”, Type:=dbOpenDynaset)
+RS1.FindFirst “操作员='” & aaa & “‘”
+RS1.Edit
+RS1.Fields(“密码”).Value = TextBox3.Value
+RS1.Update
+RS1.Close
+Set RS1 = Nothing
+Set DB1 = Nothing
+MsgBox “密码更换成功!,新设置的密码为:” & TextBox3.Value & “,请牢记密码!”
+Unload Me
+Else
+MsgBox “确认密码输入有误,请重新输入!”, 1 + 64, “系统提示”
+TextBox3.SetFocus
+End If
+Else
+MsgBox “原密码输入错误,请重新输入!”, 1 + 64, “系统提示”
+TextBox1.SetFocus
+End If
+End If
+End Sub
+
+Private Sub CommandButton2_Click()
+Unload Me
+End Sub
+
+Private Sub UserForm_Initialize()
+操作员 Me.ComboBox1
+End Sub
+
+Private Sub Worksheet_Activate()
+Application.ScreenUpdating = False
+With ActiveWindow
+.DisplayHorizontalScrollBar = False
+.DisplayVerticalScrollBar = False
+End With
+Application.ScreenUpdating = True
+End Sub
+
+Private Sub Worksheet_Deactivate()
+With ActiveWindow
+.DisplayHorizontalScrollBar = True
+.DisplayVerticalScrollBar = True
+End With
+End Sub
