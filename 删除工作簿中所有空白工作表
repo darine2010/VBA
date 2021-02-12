@@ -1,0 +1,11 @@
+2.37删除工作簿中所有空白工作表
+Sub 删除空表()
+Application.DisplayAlerts = False
+Dim MSH As Object
+For Each MSH In Sheets
+If Application.CountA(MSH.UsedRange) = 0 And MSH.Shapes.Count = 0 Then
+MSH.Delete
+End If
+Next
+Application.DisplayAlerts = True
+End Sub
