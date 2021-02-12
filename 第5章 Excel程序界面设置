@@ -1,0 +1,342 @@
+第5章 Excel程序界面设置
+第112例：用进度条显示程序运行进度(进度条)
+Private Sub CommandButton1_Click()
+ProgressBar1.Visible = True
+ProgressBar1.Max = 10000
+ProgressBar1.Min = 0
+For I = 1 To 5000
+Sheets(“SHEET1”).Cells(I, 1) = I
+ProgressBar1.Value = I
+Next I
+MsgBox “程序运行结束”
+ProgressBar1.Visible = False
+End Sub
+
+第113例：窗体流动图片
+Dim MMM As Integer
+Private Sub CommandButton1_Click()
+Dim j As Long
+Dim x As Byte
+MMM = 1
+Do
+If MMM = 100 Then Exit Sub
+For j = 1 To 600
+DoEvents
+Next j
+
+Image1.Left = Image1.Left – 1
+Image2.Left = Image2.Left – 1
+Image3.Left = Image3.Left – 1
+Image4.Left = Image4.Left – 1
+Image5.Left = Image5.Left – 1
+Image6.Left = Image6.Left – 1
+If Image1.Left <= -Image1.Width Then Image1.Left = Me.Width
+If Image2.Left <= -Image2.Width Then Image2.Left = Me.Width
+If Image3.Left <= -Image3.Width Then Image3.Left = Me.Width
+If Image4.Left <= -Image4.Width Then Image4.Left = Me.Width
+If Image5.Left <= -Image5.Width Then Image5.Left = Me.Width
+If Image6.Left <= -Image6.Width Then Image6.Left = Me.Width
+Loop Until Date > #12/31/2007#
+
+End Sub
+
+Private Sub CommandButton2_Click()
+MMM = 100
+End Sub
+
+Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
+MMM = 100
+End Sub
+
+第114例：设置可转换的背景图
+Private Sub Workbook_Open()
+Sheets(“sheet2”).ScrollArea = “$a$1”
+Sheets(“SHEET2″).Unprotect Password:=”123456”
+调整图片位置和大小
+Sheets(“SHEET2″).Protect Password:=”123456”
+End Sub
+
+Sub 调整图片位置和大小()
+With Sheets(“SHEET2”).Pictures(1)
+.Top = ActiveWindow.Top
+.Left = ActiveWindow.Left
+.Width = ActiveWindow.Width + 20
+.Height = ActiveWindow.Height
+End With
+End Sub
+
+Private Sub ListBox1_Click()
+On Error Resume Next
+Sheets(“SHEET2″).Unprotect Password:=”123456”
+Sheets(“SHEET2”).Pictures(1).Delete
+Set BBB = Sheets(“SHEET2”).Pictures.Insert(ThisWorkbook.Path & “\” & “PIC” & “\” & ListBox1.Value)
+调整图片位置和大小
+Sheets(“SHEET2″).Protect Password:=”123456”
+End Sub
+
+Private Sub UserForm_Initialize()
+On Error Resume Next
+Dim xlsFile As String
+xlsFile = Dir(ThisWorkbook.Path & “\” & “PIC” & “\” & “*.*”)
+For I = 1 To 15
+ListBox1.AddItem xlsFile
+xlsFile = Dir
+Next
+End Sub
+
+第115例：显示所有工具栏名称和英文名称
+Sub 显示所有菜单栏工具栏名称()
+For I = 2 To Application.CommandBars.Count + 1
+Cells(I, 1) = I – 1
+Cells(I, 2) = CommandBars(I – 1).NameLocal
+Cells(I, 3) = CommandBars(I – 1).Name
+Next I
+End Sub
+
+第116例：批量显示内置命令图标
+Sub FaceId()
+Application.ScreenUpdating = False
+Dim x As Integer, y As Integer, k As Integer
+On Error Resume Next
+Dim 控件 As CommandBarButton
+Set 控件 = Application.CommandBars(4).Controls.Add
+For x = 1 To 10
+For y = 1 To 5
+k = k + 1
+Cells(x, y) = k
+控件.FaceId = k
+控件.CopyFace
+Cells(x, y).Select
+ActiveSheet.Paste
+Next y
+Next x
+控件.Delete
+Set 控件 = Nothing
+Application.ScreenUpdating = True
+End Sub
+
+第117例：修改图标和程序标题名称
+Private Sub Workbook_Open()
+Dim IconPath As Variant
+Dim hIcon As Long
+IconPath = ThisWorkbook.Path & “\MSN.ICO”
+hIcon = ExtractIcon(0, IconPath, 0)
+SendMessage FindWindow(“XLMAIN”, Application.Caption), WM_SETICON, 1, hIcon
+Application.Caption = “蓝色幻想的程序”
+End Sub
+
+Option Explicit
+Public Declare Function ExtractIcon Lib “shell32.dll” Alias “ExtractIconA” (ByVal hInst As Long, ByVal lpszExeFileName As String, ByVal nIconIndex As Long) As Long
+Public Declare Function SendMessage Lib “user32” Alias “SendMessageA” (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Integer, ByVal lParam As Long) As Long
+Public Declare Function FindWindow Lib “user32” Alias “FindWindowA” (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+Public Const WM_SETICON = &H80
+
+第118例：动态调整窗口结构
+Private Sub CheckBox1_Click()
+ActiveWindow.DisplayHeadings = CheckBox1.Value
+End Sub
+
+Private Sub CheckBox2_Click()
+Application.DisplayStatusBar = CheckBox2.Value
+End Sub
+
+Private Sub CheckBox3_Click()
+Application.DisplayFormulaBar = CheckBox3.Value
+End Sub
+
+Private Sub CheckBox4_Click()
+ActiveWindow.DisplayWorkbookTabs = CheckBox4.Value
+End Sub
+
+Private Sub CheckBox5_Click()
+ActiveWindow.DisplayHorizontalScrollBar = CheckBox5.Value
+End Sub
+
+Private Sub CheckBox6_Click()
+ActiveWindow.DisplayVerticalScrollBar = CheckBox6.Value
+End Sub
+
+第119例：屏蔽右键菜单
+Sub 屏蔽菜单()
+Application.CommandBars(“Cell”).Enabled = False
+Application.CommandBars(“Toolbar list”).Enabled = False
+Application.CommandBars(“Column”).Enabled = False
+Application.CommandBars(“Row”).Enabled = False
+Application.CommandBars(“Ply”).Enabled = False
+End Sub
+
+Sub 显示菜单()
+Application.CommandBars(“Cell”).Enabled = True
+Application.CommandBars(“Toolbar list”).Enabled = True
+Application.CommandBars(“Column”).Enabled = True
+Application.CommandBars(“Row”).Enabled = True
+Application.CommandBars(“Ply”).Enabled = True
+End Sub
+
+第120例：屏蔽菜单栏和工具栏命令
+Sub 屏蔽命令()
+Application.CommandBars(1).Controls(“编辑(&E)”).Controls(“剪切(&T)”).Enabled = False ‘工作表菜单栏
+Application.CommandBars(3).Controls(“剪切(&T)”).Enabled = False ‘常用菜单栏
+Application.CommandBars(“Cell”).Controls(“剪切(&T)”).Enabled = False ‘单元格快捷菜单栏
+End Sub
+
+Sub 解除屏蔽()
+Application.CommandBars(1).Controls(“编辑(&E)”).Controls(“剪切(&T)”).Enabled = True
+Application.CommandBars(3).Controls(“剪切(&T)”).Enabled = True
+Application.CommandBars(“Cell”).Controls(“剪切(&T)”).Enabled = True
+End Sub
+第121例：在右键菜单中设置自定义按钮
+Sub AA()
+MsgBox “这是新添加的命令,呵呵”
+End Sub
+Sub 添加自定义命令()
+On Error Resume Next
+Application.CommandBars(“CELL”).Controls(“兰色幻想”).Delete
+Dim MC As CommandBarControl
+Set MC = Application.CommandBars(“CELL”).Controls.Add
+MC.Caption = “兰色幻想”
+MC.OnAction = “AA”
+MsgBox “添加完成”
+End Sub
+Sub 删除合并单元格命令()
+Application.CommandBars(“CELL”).Controls(“兰色幻想”).Delete
+MsgBox “已删除”
+End Sub
+
+第122例：工具栏中添加组合框
+Dim MCOB As CommandBarComboBox
+Sub 添加()
+On Error Resume Next
+Application.CommandBars(“工作表定位”).Delete
+Dim MBAR As CommandBar
+Set MBAR = Application.CommandBars.Add
+MBAR.Position = msoBarPopup
+MBAR.Name = “工作表定位”
+MBAR.Visible = True
+Set MCOB = MBAR.Controls.Add(Type:=msoControlComboBox)
+For I = 1 To Sheets.Count
+MCOB.AddItem Sheets(I).Name
+MCOB.OnAction = “选取”
+Next I
+MCOB.DropDownLines = 30
+End Sub
+Sub 选取()
+Sheets(MCOB.Text).Select
+End Sub
+
+第123例：查找命令按钮是否存在
+Sub AA()
+MsgBox “这是新添加的命令,呵呵”
+End Sub
+Sub 添加自定义命令()
+On Error Resume Next
+Application.CommandBars(“CELL”).Controls(“兰色幻想”).Delete
+Dim MC As CommandBarControl
+Set MC = Application.CommandBars(“CELL”).Controls.Add
+MC.Caption = “兰色幻想”
+MC.OnAction = “AA”
+MsgBox “添加完成”
+End Sub
+Sub 删除合并单元格命令()
+Application.CommandBars(“CELL”).Controls(“兰色幻想”).Delete
+MsgBox “已删除”
+End Sub
+
+Sub 查找命令是否存在()
+On Error Resume Next
+Set X = Application.CommandBars(“CELL”).Controls(“兰色幻想”)
+If X Is Nothing Then
+MsgBox “该命令不存在”
+Else
+MsgBox “该命令按钮存在”
+End If
+End Sub
+
+第124例：工具栏按纽添加自定义图标
+Sub 插入图片()
+For X = 1 To 4
+Set BBB = Sheets(“SHEET1”).Pictures.Insert(ThisWorkbook.Path & “\” & X & “.JPG”)
+Next X
+End Sub
+Sub 删除图片()
+On Error Resume Next
+For Each XX In Sheets(“SHEET1”).Pictures
+XX.Delete
+Next XX
+End Sub
+
+Sub 添加()
+删除图片
+插入图片
+Dim Mcom As CommandBar
+Dim Mbotton As CommandBarButton
+On Error Resume Next
+Application.CommandBars(“工具栏”).Delete
+Set Mcom = Application.CommandBars.Add
+Mcom.Visible = True
+Mcom.Name = “工具栏”
+For i = 1 To 4
+Set Mbotton = Mcom.Controls.Add
+Sheet1.Pictures(i).Copy
+Mbotton.PasteFace
+Next i
+删除图片
+End Sub
+
+第125例：自由订制程序菜单和工具栏
+Sub 添加菜单和工具栏()
+On Error Resume Next
+删除自定义工具栏和菜单
+Dim MROW As Integer
+Dim Cmm As CommandBar
+Dim Con As CommandBarControl
+Dim Con1 As CommandBarControl
+ROW1 = [B65536].End(xlUp).Row
+ROW2 = [C65536].End(xlUp).Row
+ROW3 = [D65536].End(xlUp).Row
+Y = Application.Max(ROW1, ROW2, ROW3)
+For x = 2 To Y
+Mcl = Cells(x, 1).End(xlToRight).Column
+Select Case Mcl
+Case 2
+Set Cmm = Application.CommandBars.Add
+Cmm.Name = Cells(x, 2).Value
+Cmm.Visible = True
+Case 3
+Set Con = Cmm.Controls.Add(Type:=Cells(x, 5).Value)
+Con.Caption = Cells(x, 3).Value
+Con.FaceId = Cells(x, 6).Value
+Con.Style = msoButtonIconAndCaption
+Case 4
+Set Con1 = Con.Controls.Add(Type:=Cells(x, 5).Value)
+Con1.Caption = Cells(x, 4).Value
+Con1.FaceId = Cells(x, 6).Value
+End Select
+Next x
+End Sub
+Sub 删除自定义工具栏和菜单()
+On Error Resume Next
+For Each RG In Range(“B2:B” & [B65536].End(xlUp).Row)
+CommandBars(RG.Value).Delete
+Next RG
+End Sub
+
+第126例：批量删除自定义工具栏和菜单栏
+Sub 添加()
+Dim mba As CommandBar
+For I = 1 To 5
+Set mba = Application.CommandBars.Add
+mba.Name = “第” & I & “个工具栏”
+mba.Visible = True
+Next I
+End Sub
+Sub 删除()
+On Error Resume Next
+For I = Application.CommandBars.Count To 1 Step -1
+With CommandBars(I)
+If .BuiltIn = False And .Name <> “符号栏” Then
+CommandBars(I).Delete
+End If
+End With
+Next I
+End Sub
