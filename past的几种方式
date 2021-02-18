@@ -1,0 +1,11 @@
+'将剪切板内容粘贴至工作表上
+'表达式.past(destination,link)  表达式为一个worksheet对象。
+rang("a1:b1").copy '复制区域无公式
+sheet1.past range("a2")
+
+range("a1:b1").copy '复制单元格区域有公式
+sheet1.past  '若不指定destination，则需要在执行前先选择好目标单元格
+
+range("a1:b1").copy
+sheet1.past ,true '需要先指定destination，粘贴的为链接。链接自原单元格区域内容。
+application.cutcopymode=true
