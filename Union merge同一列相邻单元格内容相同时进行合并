@@ -1,0 +1,17 @@
+'使用union merge,合并内容相同的相邻单元格
+Sub test0218()
+Dim rng As Range, i%, a%
+a = Cells(Rows.Count, 2).End(xlUp).Row
+Application.DisplayAlerts = False
+For i = 4 To a '4为待合并单元格区域首个单元格所在行
+If Cells(i, 2) = Cells(i, 2).Offset(1) Then
+  n = n + 1
+  If n = 1 Then Set rng = Cells(i, 2)
+ Set rng = Union(rng, Cells(i, 2).Offset(1))
+    Else
+    rng.Merge
+    n = 0
+End If
+Next
+Application.DisplayAlerts = True
+End Sub
