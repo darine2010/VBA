@@ -3,6 +3,7 @@ Dim rng As Range, a%, path1 As String
 a = Cells(Rows.Count, 1).End(xlUp).Row
 For Each rng In Range([a2], Cells(a, 1))
 path1 = ThisWorkbook.Path & "\pic\" & rng.Value & ".jpg"
+rng.ClearComments
 With rng.AddComment.Shape
 .Height = 50
 .Width = 40
