@@ -1,0 +1,32 @@
+Sub 合并相邻相同值单元格()
+Dim a%, i%
+Application.DisplayAlerts = False
+
+a = Cells(Rows.Count, 2).End(xlUp).Row
+For i = a To 4 Step -1
+If Cells(i, 2) = Cells(i, 2).Offset(-1) Then
+Cells(i, 2).Offset(-1).Resize(2).Merge
+End If
+Next
+Application.DisplayAlerts = True
+End Sub
+
+Sub 拆分填充相邻相同值单元格1()
+Dim a%, i%, b%
+a = Cells(Rows.Count, 2).End(xlUp).Row
+For i = 4 To a
+b = Cells(i, 2).MergeArea.Count
+Cells(i, 2).UnMerge
+Cells(i, 2).Resize(b) = Cells(i, 2)
+
+Next
+End Sub
+
+Sub 拆分填充相邻相同值单元格2()
+Dim rng As Range, a%
+For Each rng In Selection
+a = rng.MergeArea.Count
+rng.UnMerge
+rng.Resize(a) = rng
+Next
+End Sub
