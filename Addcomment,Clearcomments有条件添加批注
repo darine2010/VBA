@@ -1,0 +1,11 @@
+Sub 有条件添加批注()
+Dim rng As Range
+For Each rng In Selection
+With rng
+If Not .Comment Is Nothing Then .ClearComments
+If .Value >= 90 Then
+.AddComment.Text "Excellent"
+.Comment.Visible = False
+End If
+End With
+Next
