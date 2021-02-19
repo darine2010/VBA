@@ -1,0 +1,13 @@
+合并相邻相同值的单元格
+Sub test0219()
+Dim a%, i%
+Application.DisplayAlerts = False
+
+a = Cells(Rows.Count, 1).End(xlUp).Row
+For i = a To 4 Step -1
+If Cells(i, 1) = Cells(i, 1).Offset(-1) Then
+Cells(i, 1).Offset(-1).Resize(2).Merge
+End If
+Next
+Application.DisplayAlerts = True
+End Sub
