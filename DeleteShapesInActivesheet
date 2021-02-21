@@ -1,0 +1,6 @@
+Sub DeleteShapes()
+dim ob as shape
+For Each ob In ActiveSheet.Shapes
+ob.Delete
+Next
+End Sub
