@@ -1,0 +1,6 @@
+Sub DeleteComments()
+Dim rng As Range
+For Each rng In Selection
+If Not rng.Comment Is Nothing Then rng.ClearComments
+Next
+End Sub
