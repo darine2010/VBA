@@ -1,0 +1,29 @@
+Sub InsertShapes()
+Dim a As Range, rng As Range, b$
+Set a = Cells(1048576, 1).End(xlUp)
+For Each rng In Range([a2], a)
+b = ThisWorkbook.Path & "\pic\" & rng.Value & ".jpg"
+rng.Offset(, 1).Select
+ActiveSheet.Pictures.Insert(b).Select
+Selection.ShapeRange.Height = 72
+Selection.ShapeRange.Width = 36
+
+Next
+End Sub
+
+
+Sub ShapeCount()
+Dim ob As Shape, a%
+a = ActiveSheet.Shapes.Count
+For Each ob In ActiveSheet.Shapes
+'ob.Select
+Cells(i + 5, "i") = ob.Name
+Cells(i + 5, "j") = ob.Type
+Cells(i + 5, "k") = ob.Left
+Cells(i + 5, "l") = ob.Top
+Cells(i + 5, "m") = ob.Width
+Cells(i + 5, "n") = ob.Height
+i = i + 1
+Next
+
+End Sub
