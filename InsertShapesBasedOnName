@@ -1,0 +1,8 @@
+Sub InsertShapesBasedOnName() '待填充区域变宽时可行，区域变窄后，删除功能失效
+Dim rng As Range
+For Each rng In Range([b2], Cells(Application.CountA([a:a]), 2))
+rng.ClearContents
+Path = ThisWorkbook.Path & "\pic\" & rng.Offset(, -1).Value & ".jpg"
+ActiveSheet.Shapes.AddPicture Path, True, True, rng.Left, rng.Top, rng.Width, rng.Height
+Next
+End Sub
